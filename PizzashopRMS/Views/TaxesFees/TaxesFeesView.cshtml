@@ -1,0 +1,288 @@
+@model DataAccessLayer.ViewModels.TaxesFeesViewModel
+@{
+    Layout = "~/Views/Shared/_LayoutCustom.cshtml";
+    ViewData["Title"] = " TaxesFees Page";
+    ViewBag.Active = "TaxesFees";
+}
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+    <!-- Bootstrap Font Icon CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.5.0/font/bootstrap-icons.css" />
+    <title>TaxesFees Page</title>
+    <link rel="stylesheet" href="~/css/taxesfees.css">
+</head>
+
+<body>
+    <div class="container-fluid p-4">
+        <div class="row ">
+            <div class="col-4 h2  fw-bold" style="color: #0066A7;">
+                Taxes/Fees
+            </div>
+        </div>
+        <div class="row bg-white p-2 ">
+            <div class="col-xl" id="">
+                <div class="row">
+                    <div class="col-12 d-flex justify-content-end">
+                        <form class="d-flex " role="search">
+                            <div class="d-flex  me-2 p-1 position-relative">
+                                <input class="search_input form-control me-2 border-0" type="text" placeholder="Search"
+                                    aria-label="Search" id="searchInputTax" oninput="TaxSearch(this)">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="23" height="23" fill="currentColor"
+                                    class="bi bi-search position-absolute search-icon-main" viewBox="0 0 16 16">
+                                    <path
+                                        d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001q.044.06.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1 1 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0" />
+                                </svg>
+                            </div>
+                            @if (ViewBag.Permissions[PermissionConst.CanAddEdit])
+                            {
+                                <button class="btn text-white d-none d-md-block ms-2" style="background-color: #0066A7;"
+                                    type="button" onclick="openAddTaxModal()">
+                                    + New Tax
+                                </button>
+                                <button class="btn text-white d-md-none ms-2"  type="button" style=" background-color: #0066A7;"
+                                    onclick="openAddTaxModal()">+</button>
+                                
+                            }
+                        </form>
+                    </div>
+                </div>
+                <div class="" id="taxesContainer">
+
+                    <partial name="_PartialTaxesFees.cshtml" />
+                </div>
+
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>
+
+@* ------------------------------------Add Taxes Modal-------------------------------------- *@
+<div class="modal fade" id="addTaxesModel" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <form asp-action="AddTax" method="post" id="addTaxForm">
+                <div class="modal-body">
+                    <div class="d-flex justify-content-between">
+                        <div class="fw-bold fs-4">Add Tax</div>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="row pe-2 mt-2">
+                        <div class="col-12">
+                            <div class="row">
+                                <div class="col-12 form-floating mt-3">
+                                    <input type="text" class="form-control" asp-for="AddEditTaxe.Taxname"
+                                        placeholder="Name">
+                                    <label asp-for="AddEditTaxe.Taxname">Name*</label>
+                                    <span asp-validation-for="AddEditTaxe.Taxname" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6 col-12 form-floating mt-3">
+                                    <select class="form-select" id="itemTypeDropdown" asp-for="AddEditTaxe.Taxtype"
+                                        aria-label="Select Tax Type" required>
+                                        <option disabled selected>Select Tax Type</option>
+                                        <option value="Percentage">Percentage</option>
+                                        <option value="Amount">Amount</option>
+                                    </select>
+                                    <label for="itemTypeDropdown">Tax Type*</label>
+                                    <span asp-validation-for="AddEditTaxe.Taxtype" class="text-danger"></span>
+                                </div>
+                                <div class="col-md-6 col-12 form-floating mt-3">
+                                    <input type="number" class="form-control" asp-for="AddEditTaxe.Taxvalue"
+                                        placeholder="Tax Value" min="0" step="0.01" required>
+                                    <label asp-for="AddEditTaxe.Taxvalue">Tax Value*</label>
+                                    <span asp-validation-for="AddEditTaxe.Taxvalue" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="d-flex">
+                                <div class="form-check form-switch d-flex align-items-center me-2 mt-3">
+                                    <input class="form-check-input" type="checkbox" asp-for="AddEditTaxe.Isenabled">
+                                    <label class="form-check-label ms-2" asp-for="AddEditTaxe.Isenabled">Is
+                                        Enabled</label>
+                                    <span asp-validation-for="AddEditTaxe.Isenabled" class="text-danger"></span>
+                                </div>
+                                <div class="form-check form-switch d-flex align-items-center me-2 mt-3">
+                                    <input class="form-check-input" type="checkbox" asp-for="AddEditTaxe.Isdefault">
+                                    <label class="form-check-label ms-2" asp-for="AddEditTaxe.Isdefault">Default</label>
+                                    <span asp-validation-for="AddEditTaxe.Isdefault" class="text-danger"></span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="d-flex justify-content-end mt-3">
+                        <button type="submit" class="btn text-white me-2"
+                            style="background-color: #0066A7;">Save</button>
+                        <button type="button" class="btn" style="border-color: #0066A7; color: #0066A7;"
+                            data-bs-dismiss="modal">Cancel</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@* ------------------------------------Edit Taxes Modal-------------------------------------- *@
+<div class="modal fade" id="editTaxesModel" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <partial name="_PartialEditModal.cshtml" />
+
+    </div>
+</div>
+
+@*------------------------------------ Delete Table Model -------------------------------------*@
+<div class="modal fade" id="taxdeleteModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
+    aria-labelledby="staticBackdropLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-body">
+                <input type="hidden" name="taxId" id="taxdeleteid">
+                <div class="d-flex justify-content-center">
+                    <img src="~/images/toppng.com-warning-icon-2400x2400.png" alt="" style="width: 10%; height: 10%;">
+                </div>
+                <div class="d-flex justify-content-center mt-3">
+                    <span class="text-muted">Are you sure you want to delete this Item?</span>
+                </div>
+                <div class="d-flex justify-content-center mt-3">
+                    <button class="btn text-white" style="background-color: #0066A7;" type="button"
+                        id="taxconfirmDeleteBtn">Yes</button>
+                    <button class="btn ms-2" style="border-color: #0066A7; color: #0066A7;" type="button"
+                        onclick="closeDeleteTableModal()">No</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"
+        integrity="sha512-VEd+nq25CkR676O+pLBnDW09R7VQX9Mdiij052gVCp5yVH3jGtH70Ho/UUv4mJDsEdTvqRCFZg0NKGiojGnUCw=="
+        crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css" rel="stylesheet" />
+    <script src="~/lib/jquery-validation/dist/jquery.validate.min.js"></script>
+    <script src="~/lib/jquery-validation/dist/additional-methods.min.js"></script>
+    <script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.min.js"></script>
+
+
+}
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+@* <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script> *@
+
+
+
+<script>
+    @* ----------------------------Search Tax------------------------ *@
+        function TaxSearch(event) {
+            console.log($(event).val());
+            $.ajax({
+                url: '/TaxesFees/TaxesFeesTableView',
+                type: 'GET',
+                data: { SearchKey: $(event).val() },
+                success: function (response) {
+                    // Update the container with the updated list of taxes
+                    $("#taxesContainer").html(response);
+                }
+            });
+        }
+
+    @* ----------------------------------open add tax model----------------------------- *@
+
+    function openAddTaxModal() {
+        var modal = new bootstrap.Modal(document.getElementById("addTaxesModel"));
+        modal.show();
+        clearAddTaxForm();
+    }
+    function closeAddTaxModal() {
+        
+        var modalEl = document.getElementById('addTaxesModel');
+        var modalInstance = bootstrap.Modal.getInstance(modalEl);
+        modalInstance.hide();
+
+    }
+    function clearAddTaxForm() {
+        $('#addTaxForm')[0].reset();
+        $('span.text-danger').text('');
+    }
+    $(document).on('click', '.btn-close, [data-bs-dismiss="modal"]', function () {
+        closeAddTaxModal();
+    });
+
+    @* ---------------Tax Type DropDown--------------- *@
+        document.getElementById('itemTypeDropdown').addEventListener('change', function () {
+            const selectedValue = this.value; // Get the selected dropdown value
+            const checkbox = document.getElementById('isEnableCheckbox'); // Get the checkbox
+
+            // Set checkbox state based on dropdown selection
+            if (selectedValue === 'Amount') {
+                checkbox.checked = true;
+            } else if (selectedValue === 'Percentage') {
+                checkbox.checked = false;
+            }
+        });
+
+    @* -------------------Edit Tax    -------------------------------- *@
+        function openEditTaxModal(taxId) {
+            $.ajax({
+                url: `/TaxesFees/GetTaxDetails?id=${taxId}`,
+                type: "GET",
+                success: function (data) {
+                    $("#editTaxesModel .modal-dialog").html(data);
+                    $("#editTaxesModel").modal("show");
+                },
+                error: function (err) {
+                    console.error("Error fetching tax details:", err);
+                    alert("Could not load tax details. Please try again.");
+                }
+            });
+        }
+    $(document).on('click', '.btn-close, [data-bs-dismiss="modal"]', function () {
+        $('#editTaxesModel').modal('hide'); // Close the modal
+    });
+
+    @* ----------------------------Delete Tax------------------------ *@
+        function openDeleteTableModal(taxId) {
+            $("#taxdeleteid").val(taxId);
+            $("#taxdeleteModal").modal("show");
+        }
+    function closeDeleteTableModal() {
+        // Hide the modal using jQuery
+        $("#taxdeleteModal").modal("hide");
+    }
+
+    $("#taxconfirmDeleteBtn").click(function () {
+        var taxId = $("#taxdeleteid").val();
+        console.log("Deleting Tax ID:", taxId);
+
+        // Perform the AJAX call
+        $.ajax({
+            url: '/TaxesFees/DeleteTaxes',
+            type: 'POST',
+            data: { taxId: taxId },
+            success: function (response) {
+                // Update the container with the updated list of taxes
+                $("#taxesContainer").html(response);
+
+                // Show a success message
+                toastr.success("Tax deleted successfully!");
+
+                // Close the modal
+                $("#taxdeleteModal").modal("hide");
+            },
+            error: function (error) {
+                console.error("Error deleting tax:", error);
+                toastr.error("An error occurred while deleting the tax.");
+            }
+        });
+    });
+</script>

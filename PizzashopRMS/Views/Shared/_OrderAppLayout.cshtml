@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - PizzaShopApp</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/PizzaShopApp.styles.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/OrderAppNav.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css" rel="stylesheet" />
+
+    @* -------------------bootstrap icon------------------------- *@
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+</head>
+
+<body>
+
+    <!-- Navbar  -->
+    <nav class="d-flex justify-content-between align-items-center px-2 ps-lg-0 py-lg-0 m-0 navbar">
+        <img src="~/images/logos/sidebar-2.png" alt="" id="sidebar-logo"
+            class="d-lg-none bg-white border rounded d-flex " data-bs-toggle="collapse" data-bs-target="#accordionExample" 
+            role="button" >
+        
+        <div class="d-flex company-logo  m-0 justify-content-center border-lg-rounded align-items-center ">
+            <img src="~/images/logos/pizzashop_logo.png" alt="company-logo" id="company-logo-img"
+                class="d-none d-lg-flex">
+            @if(ViewBag.roleorderapp != "chef")
+            {
+                <a class="fs-4 ps-3 text-white" id="company-name" style="display: flex; margin:0 !important; text-decoration: none;" asp-controller="Dashboard" asp-action="DashboardView">
+                    PIZZASHOP
+                </a>
+            }
+            else
+            {
+                <div class="fs-4 ps-3 text-white" id="company-name" style="display: flex; margin:0 !important; ">
+                    PIZZASHOP
+                </div>
+            }
+
+        </div>
+        <div class="btn-group ">
+            <div class="btn-group d-flex gap-2 fourbages d-none d-md-flex">
+                <a class="allcard" asp-action="Kot" asp-controller="Kot">
+                    <div class="navbar-card @(ViewBag.Active == "Kot" ? "navbar-card-selected" : "")">
+                        <i class="bi bi-clipboard2-minus me-2"></i>
+                        <span>Kot</span>
+                    </div>
+                </a>
+                @if(ViewBag.roleorderapp != "chef")
+                {
+                    <a class="allcard" asp-action="WaitingList" asp-controller="WaitingList">
+                        <div class="navbar-card @(ViewBag.Active == "Waiting List" ? "navbar-card-selected" : "")">
+                            <i class="bi bi-clock me-2"></i>
+                            <span>Waiting List</span>
+                        </div>
+                    </a>
+                }
+                @if(ViewBag.roleorderapp != "chef")
+                {
+                    <a class="allcard" asp-action="TablesApp" asp-controller="TablesApp">
+                        <div class="navbar-card @(ViewBag.Active == "Tables" ? "navbar-card-selected" : "")">
+                            <i class="bi bi-square-fill me-2"></i>
+                            <span>Tables</span>
+                        </div>
+                    </a>
+                }
+                @if(ViewBag.roleorderapp != "chef")
+                {
+                    <a class="allcard" asp-action="MenuApp" asp-controller="MenuApp">
+                        <div class="navbar-card me-2 @(ViewBag.Active == "Menu" ? "navbar-card-selected" : "")">
+                            <i class="bi bi-cake me-2"></i>
+                            <span>Menu</span>
+                        </div>
+                    </a>
+                }
+            </div>
+           
+            <a class=" dropdown-toggle-split" href="#" role="button" id="dropdownMenuLink" data-bs-toggle="dropdown"
+                aria-expanded="false" style="text-decoration: none;">
+                <img src=@((ViewBag.image != null) ? ViewBag.image : "/images/Default_pfp.svg.png") id="profile-pic"
+                    alt="">
+            </a>
+            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdownMenuLink" >
+                <li><a class="dropdown-item h6">
+                        <img src=@((ViewBag.image != null) ? ViewBag.image : "/images/Default_pfp.svg.png") alt=""
+                            id="profile-pic">
+                        @ViewBag.email
+                    </a>
+                </li>
+                @if (ViewBag.roleorderapp != "chef")
+                {
+                    <li>
+                        <a class="dropdown-item" asp-action="UserProfileView" asp-controller="UserProfile">
+                            <i class="bi bi-person-circle p-2"></i>
+                            My Profile
+                        </a>
+                    </li>
+                    <li>
+                        <a class="dropdown-item" asp-action="ChangePasswordView" asp-controller="UserProfile">
+                            <i class="bi bi-arrow-clockwise p-2"></i>
+                            Change Password
+                        </a>
+                    </li>
+                }
+                <li>
+                    <a class="dropdown-item" data-bs-toggle="modal" data-bs-target="#staticBackdrop">
+                        <i class="bi bi-box-arrow-right p-2"></i>
+                        Logout
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </nav>
+    <!-- Accordion for small screens -->
+    <div class="collapse d-md-none" id="accordionExample" style="background-color: #0066A7;">
+        <div class="btn-group d-flex gap-2 fourbages p-2 justify-content-evenly">
+            <a class="allcard" asp-action="Kot" asp-controller="Kot">
+                <div class="navbar-card @(ViewBag.Active == "Kot" ? "navbar-card-selected" : "")">
+                    <i class="bi bi-clipboard2-minus me-2"></i>
+                    <span>Kot</span>
+                </div>
+            </a>
+            <a class="allcard" asp-action="WaitingList" asp-controller="WaitingList">
+                <div class="navbar-card @(ViewBag.Active == "Waiting List" ? "navbar-card-selected" : "")">
+                    <i class="bi bi-clock me-2"></i>
+                    <span>Waiting List</span>
+                </div>
+            </a>
+            <a class="allcard" asp-action="TablesApp" asp-controller="TablesApp">
+                <div class="navbar-card @(ViewBag.Active == "Tables" ? "navbar-card-selected" : "")">
+                    <i class="bi bi-square-fill me-2"></i>
+                    <span>Tables</span>
+                </div>
+            </a>
+            <a class="allcard"  asp-action="MenuApp" asp-controller="MenuApp">
+                <div class="navbar-card me-2 @(ViewBag.Active == "Menu" ? "navbar-card-selected" : "")">
+                    <i class="bi bi-cake me-2"></i>
+                    <span>Menu</span>
+                </div>
+            </a>
+        </div>
+    </div>
+
+    <!-- Main block  -->
+    <div class="border  main-block">
+        <partial name="_Notification.cshtml" />
+        @RenderBody()
+    </div>
+
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    
+    @await RenderSectionAsync("Scripts", required: false)
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js" integrity="sha512-VEd+nq25CkR676O+pLBnDW09R7VQX9Mdiij052gVCp5yVH3jGtH70Ho/UUv4mJDsEdTvqRCFZg0NKGiojGnUCw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+</body>
+
+</html>
+<div class="modal fade" id="staticBackdrop" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
+    aria-labelledby="staticBackdropLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-body ">
+                <div class="d-flex justify-content-center ">
+                    <img src="~/images/toppng.com-warning-icon-2400x2400.png" alt="" style="width: 10%; height: 10%;">
+                </div>
+                <div class="d-flex justify-content-center mt-3">
+                    <span class="text-muted">Are you sure you want Logout ?</span>
+                </div>
+                <div class="d-flex justify-content-center mt-3">
+                    <button class="btn text-white" style="background-color: #0066A7;" type="submit"
+                        id="loginbtn">Yes</button>
+                    <button class="btn ms-2" style="border-color: #0066A7; color: #0066A7;" type="submit"
+                        data-bs-dismiss="modal">No</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.getElementById("loginbtn").addEventListener("click", function () {
+        console.log("Logout")
+        window.location.href = "@Url.Action("Logout", "Login")";
+    });
+</script>

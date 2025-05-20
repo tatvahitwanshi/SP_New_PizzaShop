@@ -1,0 +1,25 @@
+
+<!-- Cancel Order Modal -->
+<div class="modal fade" id="CancelOrderAppModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+
+            <form class="modal-body" id="cancelOrderAppForm">
+                    <div class="d-flex justify-content-between mb-3">
+                        <h1 class="modal-title fs-5 fw-semibold special-color" >Complete Confirmation</h1>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <input type="text" hidden id="cancelOrderId">
+                    <div class="d-flex align-items-center flex-column gap-2 justify-content-center mb-3">
+                        <img src="~/images/toppng.com-warning-icon-2400x2400.png" alt="" style="height: 35px; width: 35px;">
+                        <div class="f-5">Are You Sure you want to Cancel Order ?</div>
+                    </div>
+
+                    <div class="d-flex justify-content-center gap-2">
+                        <button type="submit" class="light-btn dark-btn" style="width: 60px;">Yes</button>
+                        <button type="button" class="light-btn" data-bs-dismiss="modal" style="width: 55px;">No</button>
+                    </div>
+            </form>
+        </div>
+    </div>
+</div>

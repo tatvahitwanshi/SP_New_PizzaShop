@@ -1,0 +1,97 @@
+*{
+    margin: 0;
+    padding: 0;
+    font-family: 'Roboto', sans-serif;
+}
+
+.navbar{
+    height: 70px;
+    background-color: #0066A7;
+    top: 0;
+    left: 0;
+    z-index: 1;
+}
+.company-logo{
+   
+    height: 100%;
+    width: 250px;
+    padding: 15px;
+    @media screen and (max-width: 992px){
+        background-color: #0066A7; 
+        width: fit-content; 
+    }
+}
+#sidebar-logo{
+    height: 35px;
+}
+#company-logo-img{
+    height: 50px;
+}
+#profile-pic{
+    height: 45px;
+    background-color: white;
+    border-radius: 50%;
+}
+@media only screen and (max-width: 992px) {
+    #company-name{
+        color: white;
+        font-weight: 600;
+        letter-spacing: 1.5px;
+    }
+}
+@media only screen and (min-width: 993px) {
+    #company-name{
+        color: #0066A7;
+        font-weight: 600;
+        letter-spacing: 1.5px;
+    }
+}
+/* Make the Navbar Sticky */
+.navbar {
+    height: 70px;
+    position: sticky;
+    top: 0;
+    width: 100%;
+    background-color: #0066A7;
+    left: 0;
+    box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+/* navbar card for Order App  */
+
+.navbar-card {
+    border: 1px solid white;
+    border-radius: 12px;
+    padding: 5px 10px;
+    color: white;
+    font-size: 14px;
+    font-weight: 500;
+    background-color: rgba(255, 255, 255, 0.1); 
+    transition: all 0.15s ease-in-out;
+    display: flex;
+    align-items: center;
+}
+
+.navbar-card:hover {
+    background-color: white;
+    color: #0066A7;
+    cursor: pointer;
+}
+
+.navbar-card-selected {
+    border: 1px solid #ffffff;
+    border-radius: 12px;
+    padding: 5px 10px;
+    color: white;
+    font-size: 14px;
+    font-weight: 600;
+    background-color: #305d7a44; 
+    display: flex;
+    align-items: center;
+}
+.allcard{
+    text-decoration: none; 
+    display:flex; 
+    justify-content: center; 
+    align-items: center;
+}

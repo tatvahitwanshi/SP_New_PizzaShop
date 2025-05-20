@@ -1,0 +1,175 @@
+@model DataAccessLayer.ViewModels.PaginationParams
+
+@{
+    Layout = "~/Views/Shared/_LayoutCustom.cshtml";
+    ViewData["Title"] = "User List Page";
+    ViewBag.Active = "UserList";
+}
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.5.0/font/bootstrap-icons.css" />
+    <link rel="stylesheet" href="~/css/userlist.css">
+
+    <title>User List</title>
+</head>
+
+<body>
+    <div class="container-fluid p-4" style="z-index: -100;">
+        <div class="row">
+            <div class="col-lg-4 col-sm-12 h2 fw-bold" style="color: #0066A7;">
+                Users
+            </div>
+            <div class="col-lg-8 col-sm-12 inner-nav d-flex justify-content-end">
+                <form class="d-flex" role="search">
+                    <div class="d-flex me-2 p-1 position-relative ">
+                        <input class="search_input form-control me-2 border-0" value="@Model.SearchKey" id="searchInput"
+                            type="text" placeholder="Search" aria-label="Search">
+                        <i class="bi bi-search position-absolute search-icon-main"></i>
+                    </div>
+                    @if (ViewBag.Permissions[PermissionConst.CanAddEdit])
+                    {
+                        <button class="btn text-white d-none d-md-block" type="submit" style="background-color: #0066A7;">
+                            <a href="@Url.Action("AddUserView", "UserList")" style="text-decoration: none;"
+                                class="p-2 text-white">
+                                + Add User
+                            </a>
+                        </button>
+                        <button class="btn text-white d-md-none d-sm-block" type="submit"
+                            style="background-color: #0066A7;">
+                            <a href="@Url.Action("AddUserView", "UserList")" style="text-decoration: none;"
+                                class="p-2 text-white">
+                                +
+                            </a>
+                        </button>
+                    }
+                </form>
+            </div>
+        </div>
+
+        <div class="row mt-3 bg-white">
+            <div class="col">
+                <div id="userListContainer">
+                    <partial name="~/Views/UserList/_PartialUserList.cshtml" />
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>
+<div class="modal fade" id="staticBackdrop1" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
+    aria-labelledby="staticBackdropLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+
+            <div class="modal-body ">
+                <div class="d-flex justify-content-center ">
+                    <img src="~/images/toppng.com-warning-icon-2400x2400.png" alt="" style="width: 10%; height: 10%;">
+                </div>
+                <input type="hidden" id="inputdeletexy" />
+                <div class="d-flex justify-content-center mt-3">
+                    <span class="text-muted">Are you sure you want to delete this user ?</span>
+                </div>
+                <div class="d-flex justify-content-center mt-3">
+                    <button class="btn text-white" style="background-color: #0066A7;" type="submit"
+                        id="deletebtn">Yes</button>
+                    <button class="btn ms-2" style="border-color: #0066A7; color: #0066A7;" type="submit"
+                        data-bs-dismiss="modal">No</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css" rel="stylesheet" />
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+    $(document).ready(function () {
+        let userIdToDelete = null;
+
+        // Capture userId when delete icon is clicked
+        @* 
+        $(".delete-user").on("click", function () {
+            userIdToDelete = $(this).data("userid");
+        }); *@
+
+            // Handle the delete confirmation button click
+            $("#deletebtn").on("click", function () {
+                console.log("delete");
+                var userIdToDeletex = $('#inputdeletexy').val();
+
+                if (userIdToDeletex) {
+                    $.ajax({
+                        url: "@Url.Action("DeleteUser", "UserList")",
+                        type: "POST",
+                        data: { userId: userIdToDeletex },
+                        success: function () {
+                            window.location.href = "@Url.Action("UserListView", "UserList")"; // Redirect after deletion
+                        },
+                        error: function (xhr, status, error) {
+                            console.error("Error deleting user:", error);
+                        }
+                    });
+                }
+            });
+    });
+    var pageSize = 5  // Get selected page size
+    var pageNumber = 1; // Get current page number
+    var sortBy = '@Model.sortBy'; // Get current sort column
+    var sortOrder = '@Model.sortOrder'; // Get current sort order
+    var searchKey = ''; // Get current search key
+
+    function getdata() {
+        console.log("Get Data Called");
+        $.ajax({
+            url: "/UserList/UserListView",
+            type: "GET",
+            data: {
+                PageSize: pageSize,
+                PageNumber: pageNumber,
+                SortColumn: sortBy,
+                SortDirection: sortOrder,
+                SearchKey: searchKey
+            },
+            success: function (data) {
+                $("#userListContainer").html(data); // Update only the partial view
+            },
+            error: function (xhr, status, error) {
+                console.error("Error fetching data:", error);
+            }
+        });
+    }
+
+
+    function updateItemsPerPage() {
+        pageSize = $("#itemsPerPage").val(); // Get selected page size
+        getdata();
+    }
+
+    $(document).ready(function () {
+        // Listen for 'input' event on search input
+        $('#searchInput').on('input', function () {
+            searchKey = $('#searchInput').val().toLowerCase();
+            console.log("Search Key:", searchKey);
+            // Get the current page size, sort column, and sort direction from ViewData
+            pageSize = $("#itemsPerPage").val();
+            pageNumber = 1;
+            getdata();
+
+        });
+    });
+
+    $(document).on("click", ".pagination-button", function (event) {
+        event.preventDefault(); // Prevent full page reload
+        pageNumber = $(this).data("page");
+        pageSize = $("#itemsPerPage").val();
+        searchKey = $("#searchInput").val();
+        getdata();
+
+    });
+</script>

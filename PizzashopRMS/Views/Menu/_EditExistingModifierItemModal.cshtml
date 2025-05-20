@@ -1,0 +1,212 @@
+@model DataAccessLayer.ViewModels.MenuViewModel
+<div class="table-responsive">
+    <table class="table">
+        <thead>
+            <tr>
+                <th scope="col"><input class="form-check-input main-check-edit" type="checkbox" value=""
+                        id="selectAllCheckbox"></th>
+                <th scope="col">Name</th>
+                <th scope="col">Unit</th>
+                <th scope="col">Rate</th>
+                <th scope="col">Quantity</th>
+
+            </tr>
+        </thead>
+        <tbody id="itemsTableBodyAll">
+            @foreach (var item in Model.ModifierItemAll.List)
+            {
+                <tr>
+                    <td>
+                        <input class="form-check-input inner-check-edit" type="checkbox" data-id="@item.ModifierItemId">
+                    </td>
+                    <td>@item.ModifierItemName</td>
+                    <td>@item.ModifierUnitname</td>
+                    <td>@item.Rate</td>
+                    <td>@item.Quantity</td>
+
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+<div class="main-pagination ">
+    <div class="item-show ">
+        <nav aria-label="Page navigation example">
+            <div class="pagination ">
+                <span class="align-self-center">Items Per Page
+                    :</span>
+                <select class="form-select form-select-sm ms-2 align-self-center" aria-label="Small select example"
+                    style=" width: unset; " id="pageSizeeditModifierAll" onchange="updatePagePerSizeAllEdit()">
+                    @if (Model.ModifierItemViewModel?.PageSize != null)
+                    {
+                        <option value="1" selected="@(Model.ModifierItemAll.PageSize == 1 ? true : false)">
+                            1
+                        </option>
+                        <option value="3" selected="@(Model.ModifierItemAll.PageSize == 3 ? true : false)">
+                            3
+                        </option>
+                        <option value="5" selected="@(Model.ModifierItemAll.PageSize == 5 ? true : false)">
+                            5
+                        </option>
+                        <option value="10" selected="@(Model.ModifierItemAll.PageSize == 10 ? true : false)">
+                            10</option>
+                        <option value="25" selected="@(Model.ModifierItemAll.PageSize == 25 ? true : false)">
+                            25</option>
+                    }
+                </select>
+            </div>
+        </nav>
+    </div>
+    <div class="showing-page">
+        <nav aria-label="Page navigation example">
+            <div class="pagination ">
+                <span class=" ms-2  align-self-center">Showing
+                    @{
+                        var startRecord = (Model.ModifierItemAll.PageNumber - 1) *
+                        Model.ModifierItemAll.PageSize + 1;
+                        var endRecord = Model.ModifierItemAll.PageNumber *
+                        Model.ModifierItemAll.PageSize;
+                        if (endRecord > Model.ModifierItemAll.Count)
+                            endRecord = Model.ModifierItemAll.Count;
+
+                        if (Model.ModifierItemAll.Count == 0)
+                        {
+                            startRecord = 0;
+                            endRecord = 0;
+                        }
+                    }
+                    <span style="color: green;" class="me-1">@startRecord -
+                        @endRecord</span> of <span style="color: red;" class="ms-1">@Model.ModifierItemAll.Count</span>
+                </span>
+                <button class="btn border ms-2  align-self-center" type="button"
+                    onclick="PanginationBtnModifierAllEdit('back')"><i class="bi bi-chevron-left "></i>
+                </button>
+                <button class="btn border ms-2  align-self-center" type="button"
+                    onclick="PanginationBtnModifierAllEdit('next')"><i class="bi bi-chevron-right"></i>
+                </button>
+            </div>
+        </nav>
+    </div>
+</div>
+
+<script>
+
+    $(document).ready(function () {
+        document.querySelectorAll(".inner-check-edit").forEach(function (checkbox) {
+            const id = parseInt(checkbox.getAttribute('data-id'));
+            if (selectedEditModifierIds.includes(id)) {
+                checkbox.checked = true;
+            }
+
+        });
+    });
+    function loadModifierAllEdit(pageSize, searchKey, pageNumber) {
+        console.log("Page Size:", pageSize, "Search Key:", searchKey, "Page Number:", pageNumber);
+
+        $.ajax({
+            url: '@Url.Action("GetEditModifierItemsAllByModifierGroup", "Menu")',
+            type: 'GET',
+            data: {
+                PageSize: pageSize,
+                SearchKey: searchKey,
+                PageNumber: pageNumber
+            },
+            success: function (data) {
+                if ($('#editmodifiermodel').hasClass('show')) {
+                    $("#GetAllModifierItemsEdit").html(data);
+                }
+            },
+            error: function (error) {
+                console.error('Error loading partial view:', error);
+            }
+        });
+    }
+
+    function updatePagePerSizeAllEdit() {
+        var pageSize = $("#pageSizeeditModifierAll").val();
+        var searchKey = $("#searchInputModifierAllEdit").val();
+        var pageNumber = @Model.ModifierItemAll.PageNumber;
+
+        loadModifierAllEdit(pageSize, searchKey, pageNumber);
+    }
+
+    function PanginationBtnModifierAllEdit(direction) {
+        console.log("pagination side");
+        var pageSize = $("#pageSizeeditModifierAll").val();
+        var searchKey = $("#searchInputModifierAllEdit").val();
+        var pageNumber = @Model.ModifierItemAll.PageNumber;
+
+
+
+        if (direction === "back") {
+            pageNumber -= 1;
+        } else {
+            pageNumber += 1;
+        }
+
+        loadModifierAllEdit(pageSize, searchKey, pageNumber);
+    }
+
+    function doSearchEditModifierAll() {
+        var pageSize = $("#pageSizeeditModifierAll").val();
+        var searchKey = $("#searchInputModifierEdit").val();
+        var pageNumber = 1;
+
+        loadModifierAllEdit(pageSize, searchKey, pageNumber);
+    }
+    @* ---------------------checkbox for modifier group edit existing list-------------------------- *@
+    $(document).ready(function () {
+        // Handle main checkbox click
+        $('.main-check-edit').on('click', function () {
+            var isChecked = $(this).is(':checked');
+            $('.inner-check-edit').prop('checked', isChecked);
+            checkAllModGroup();
+        });
+
+        // Handle individual checkbox clicks
+        $(document).on('click', '.inner-check-edit', function () {
+            if (!$(this).is(':checked')) {
+                // Uncheck main checkbox if one inner checkbox is unchecked
+                $('.main-check-edit').prop('checked', false);
+            } else {
+                // Check if all inner checkboxes are checked
+                var allChecked = $('.inner-check-edit').length === $('.inner-check-edit:checked').length;
+                $('.main-check-edit').prop('checked', allChecked);
+            }
+        });
+    });
+
+    function checkAllModGroup()
+    {
+        document.querySelectorAll('.inner-check-edit').forEach(function (est) {
+
+            const checkbox = $(est);
+            const modifierId = checkbox.data('id');
+            console.log(modifierId);
+            const modifierName = checkbox.closest('tr').find('td:nth-child(2)').text().trim();
+            const container = $('#editselectedItemsContainer');
+
+            if (checkbox.is(':checked')) {
+                // Add the selected item to the div
+                const badge = `
+                <div class="selected-item badge text-black me-2 mb-2 p-2 d-flex align-items-center border">
+                    <span class="me-2">${modifierName}</span>
+                    <button type="button" class="btn-close remove-item" aria-label="Close" data-id="${modifierId}"></button>
+                </div>`;
+                container.append(badge);
+                selectedEditModifierIds.push(modifierId);
+                console.log("qqqqssss", selectedEditModifierIds);
+                container.show();
+
+            } else {
+                selectedEditModifierIds = selectedEditModifierIds.filter(id => id !== modifierId);
+                console.log("Remove", selectedEditModifierIds);
+                // Remove the item from the div
+                container.find(`.remove-item[data-id="${modifierId}"]`).parent().remove();
+                if (container.children().length === 0) {
+                    container.hide();
+                }
+            }
+        });
+    }
+</script>

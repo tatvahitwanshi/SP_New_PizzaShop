@@ -1,0 +1,166 @@
+@model DataAccessLayer.ViewModels.MenuViewModel
+
+<div class="d-flex justify-content-between">
+    <h5 class="modal-title">Edit Modifier</h5>
+    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+</div>
+
+<form action="UpdateModifierItem" method="post" id="editModifierItemForm">
+    <input type="hidden" id="editModifierItemId" name="AddEditModItem.ModifierItemId"
+        value="@Model.AddEditModItem?.ModifierItemId" />
+    @* <input type="hidden" name="ModifierItemId" value="@Model.AddEditModItem?.ModifierItemId" /> *@
+    @* <input type="text" id="editmodifierGroupIds" name="ModifierGroupIds"/> *@
+
+    <div class="row g-3">
+        <div class="col-md-6">
+            <div class="dropdown w-100 h-100 border">
+                <div class="btn dropdown-toggle w-100 d-flex justify-content-between align-items-center " type="button"
+                    data-bs-toggle="dropdown" style="border: none !important;">
+                    Select Modifier Options
+                </div>
+                <div id="editselectedModifierContainer" class="d-flex flex-wrap p-2">
+                    @if (Model.AddEditModItem?.ModifierGroupIds != null && Model.AddEditModItem.ModifierGroupIds.Any())
+                    {
+                        @foreach (var selectedGroupId in Model.AddEditModItem.ModifierGroupIds)
+                        {
+                            var selectedGroup = Model.ModifierGroupModel?.FirstOrDefault(g => g.ModifierGroupId ==
+                            selectedGroupId);
+                            if (selectedGroup != null)
+                            {
+                                <span class="badge m-1 selected-modifier text-black"
+                                    data-id="@selectedGroup.ModifierGroupId">@selectedGroup.ModifierGroupName</span>
+                            }
+                        }
+                    }
+                </div>
+                <ul class="dropdown-menu p-2" style="max-height: 200px; overflow-y: auto;">
+                    @if (Model.ModifierGroupModel != null)
+                    {
+                        @foreach (var modgroup in Model.ModifierGroupModel)
+                        {
+                            bool isChecked = Model.AddEditModItem?.ModifierGroupIds != null &&
+                            Model.AddEditModItem.ModifierGroupIds.Contains(modgroup.ModifierGroupId);
+
+                            <li>
+                                <label class="dropdown-item">
+                                    <input type="checkbox" value="@modgroup.ModifierGroupId" class="me-2 editmodgroupCheckbox"
+                                        name="editmodgroupCheckbox" @(isChecked ? "checked" : "")>
+                                    @modgroup.ModifierGroupName
+                                </label>
+                            </li>
+                        }
+                    }
+                </ul>
+            </div>
+
+        </div>
+
+        <div class="col-md-6">
+            <div class="form-floating">
+                <input type="text" class="form-control" asp-for="@Model.AddEditModItem.ModifierItemName"
+                    id="editModifieritemname" placeholder="Name">
+                <label for="editModifieritemname">Name</label>
+                <span asp-validation-for="@Model.AddEditModItem.ModifierItemName" class="text-danger"></span>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="form-floating">
+                <input type="number" class="form-control" asp-for="@Model.AddEditModItem.Rate" id="editModifieritemrate"
+                    placeholder="Rate">
+                <label for="editModifieritemrate">Rate</label>
+                <span asp-validation-for="@Model.AddEditModItem.Rate" class="text-danger"></span>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="form-floating">
+                <input type="number" class="form-control" asp-for="@Model.AddEditModItem.Quantity"
+                    id="editModifieritemquantity" placeholder="Quantity">
+                <label for="editModifieritemquantity">Quantity*</label>
+                <span asp-validation-for="@Model.AddEditModItem.Quantity" class="text-danger"></span>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="form-floating">
+                <select class="form-select" id="editModifieritemunit" asp-for="AddEditModItem.Modifiersunit">
+                    @foreach (var itemsUnit in Model.ItemsUnit)
+                    {
+                        <option value=@itemsUnit.Unitid>
+                            @itemsUnit.Unitname
+                        </option>
+                    }
+                </select>
+                <label for="editModifieritemunit">Unit*</label>
+            </div>
+        </div>
+        <div class="col-md-12">
+            <div class="form-floating">
+                <textarea class="form-control" asp-for="@Model.AddEditModItem.ModifierItemDescription"
+                    id="editModifieritemdescription" placeholder="Description" style="height: 80px;"></textarea>
+                <label for="editModifieritemdescription">Description</label>
+                <span asp-validation-for="@Model.AddEditModItem.ModifierItemDescription" class="text-danger"></span>
+            </div>
+        </div>
+    </div>
+    <div class="d-flex justify-content-end mt-3">
+        <button type="button" id="editModifieritemupdatebtn" class="btn text-white"
+            style="background-color: #0066A7;">Update</button>
+        <button type="button" class="btn ms-2" style="border-color: #0066A7; color: #0066A7; text-decoration: none;"
+            data-bs-dismiss="modal">Cancel</button>
+    </div>
+</form>
+
+<script>
+    $(document).ready(function () {
+
+        var modifierGroups = @Html.Raw(Json.Serialize(Model.AddEditModItem?.ModifierGroupIds ?? new List<int>()));
+
+        modifierGroups.forEach(function (modGroup) {
+            console.log("Modifier Group ID:", modGroup);
+            editselectedModifierIds.push(modGroup.toString());
+        });
+
+    });
+    $("#editModifieritemModal").on("hidden.bs.modal", function () {
+        editselectedModifierIds = [];
+        console.log("Modal closed!");
+        @* $('#editModifieritemModal').modal('hide'); // Ensures the modal is properly closed *@
+          
+        });
+
+    $("#editModifieritemupdatebtn").on("click", function (event) {
+        event.preventDefault(); // Prevent default form submission
+
+        var formData = new FormData($("#editModifierItemForm")[0]); // Get form data properly
+        editselectedModifierIds.forEach(id => formData.append("ModifierGroupIds[]", id));
+       
+        $.ajax({
+            url: $("#editModifierItemForm").attr("action"),
+            type: $("#editModifierItemForm").attr("method"),
+            data: formData,
+            processData: false,
+            contentType: false,
+            success: function (response) {
+                console.log("AJAX Response:", response); // Debugging
+
+                if (response.success) {
+                    toastr.success("Modifier item updated successfully!");
+                    var modalEl = document.getElementById('editModifieritemModal');
+                    var modalInstance = bootstrap.Modal.getInstance(modalEl);
+                    modalInstance.hide();
+                    // Refresh the page after 1 second
+                    @* setTimeout(function () {
+                        location.reload();
+                    }, 1000); *@
+                } else {
+                    toastr.error(response.message);
+                }
+            },
+            error: function (xhr, status, error) {
+                console.log("AJAX Error:", xhr.responseText); // Debugging
+                toastr.error("Something went wrong.");
+            }
+        });
+    });
+
+</script>

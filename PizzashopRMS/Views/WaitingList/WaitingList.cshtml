@@ -1,0 +1,67 @@
+@model DataAccessLayer.ViewModels.WaitingListViewModel;
+@{
+    Layout = "~/Views/Shared/_OrderAppLayout.cshtml";
+    ViewData["Title"] = "Waiting List";
+    ViewBag.Active = "Waiting List";
+}
+<link rel="stylesheet" href="~/css/OrderApp/waitinglist.css" asp-append-version="true" />
+
+<div class="waiting-list-container">
+
+    <!-- Waiting List -->
+    <div class="px-0 d-flex justify-content-between mb-2">
+        <div class="d-flex fs-2 fw-bold special-color">Waiting List</div>
+        <div class="waiting-token-btn" type="button" onclick="GenerateTokenModal()">
+            + Waiting Token
+        </div>
+    </div>
+
+    <div id="tab-bar-content">
+        <partial name="_TabContent" />
+    </div>
+</div>
+
+
+<!-- Delete Modals -->
+<div class="modal fade" id="deleteTokenModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <!-- </div> -->
+            <form class="modal-body" asp-action="DeleteToken" method="post" id="deleteFormToken">
+                <div class="d-flex justify-content-between mb-3">
+                    <h1 class="modal-title fs-5 fw-bold special-color" id="exampleModalLabel">Delete Confirmation</h1>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <input type="text" name="tokenId" id="tokenIdForDelete" hidden>
+
+                <div class="d-flex justify-content-center">
+                    <img src="~/images/toppng.com-warning-icon-2400x2400.png" alt="" style="width: 10%; height: 10%;">
+                </div>
+                <div class="d-flex justify-content-center mt-3">
+                    <span class="text-muted">Are you sure you want to delete this Waiting Token?</span>
+                </div>
+
+                <div class="d-flex justify-content-center mt-1">
+                    <button type="submit" class="save-cancel-btn fw-semibold save-btn" id=""
+                        data-bs-dismiss="modal">Yes</button>
+                    <button type="button" class="save-cancel-btn fw-semibold cancel-btn" id=""
+                        data-bs-dismiss="modal">No</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<partial name="_AssignTableModal" />
+<div id="GenerateTokenModalContainer">
+    <!-- waiting token Modal -->
+    @* <partial name="_GenerateTokenModal" /> *@
+</div>
+
+
+<script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.min.js"></script>
+@section Scripts
+{
+    <script src="~/js/OrderApp/waitinglist.js" asp-append-version="true"></script>
+    <partial name="_ValidationScriptsPartial" />
+}

@@ -1,0 +1,286 @@
+.special-color{
+    color: #0066A7;
+}
+
+.table-container
+{
+    background-color: #F2F2F2;
+    padding: 20px 40px;
+}
+
+/* ----card color---- */
+.card-color-running{
+    background-color: #e0f2ff;
+    border: 1px solid #bddcf2;
+}
+.card-color-assigned{
+    background-color: #f2faec;
+    border: 1px solid #a3d874;
+}
+.card-color-available{
+    background-color: #fafafa;
+    border: 1px solid #efefef;
+}
+.card-color-selected{
+    border: 1px solid #a3d874;
+
+}
+
+/* -------------------- */
+
+.rotate-icon {
+    transition: transform 0.3s ease;
+}
+
+.arrow-btn.collapsed .rotate-icon {
+    transform: rotate(270deg);
+}
+
+.arrow-btn:not(.collapsed) .rotate-icon {
+    transform: rotate(360deg); 
+}
+
+.btn-outline-special {
+    color: #0066A7;
+    border: 1px solid #0066A7;
+    background-color: transparent;
+    transition: all 0.3s ease;
+}
+
+.btn-outline-special:hover {
+    background-color: #0066A7;
+    color: white;
+}
+
+.outline-special {
+    width: 40px;          
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid #0066A7; 
+    color: #0066A7;
+}
+
+.color-available
+{
+    color: #D2CEC6;
+}
+
+.color-selected
+{
+    color: #96b677;
+}
+
+.color-assigned
+{
+    color: #a3d874;
+}
+.color-assigned-dot
+{
+    background-color: #a3d874;
+}
+
+.color-running
+{
+    color: #bddcf2;
+}
+.assign-btn{
+    background-color: #0066A7;
+    color: white;
+}
+
+/* ----waiting list---- */
+.waiting-token-font
+{
+    font-size: 15px;
+    font-weight: bold;
+    color: grey;
+}
+
+.waiting-token-font thead
+{
+    color: rgb(75, 75, 75);
+}
+
+.waiting-list-table tbody > tr
+{
+    line-height: 2;
+}
+
+.total-tokan
+{
+    font-size: 12px;
+    text-align: center;
+    padding: 2px 6px;
+    font-weight: bold;
+    color: white;
+    background-color: grey;
+    border-radius: 100%;
+}
+
+/* Modal CSS */
+.save-cancel-btn{
+    margin-left: 5px;
+    height: 40px;
+    width: 80px;
+    border-radius: 3px;
+    font-weight: 600;
+}
+
+.save-btn{
+    background-color: #0066A7;
+    border: 1px solid #0066A7;
+    color: white;
+}
+
+.cancel-btn{
+    background-color: white;
+    color: #0066A7;
+    border: 1px solid #0066A7;
+}
+
+.form-select
+{
+    width: 230px !important;
+    outline: none !important;
+}
+
+.form-select:focus
+{
+    box-shadow: none !important;
+    outline: none !important;
+}
+
+/* waiting list modal  */
+.token-generate-modal .form-floating>label {
+    position: absolute;
+    top: 0;
+    left: 12px;
+    height: 100%;
+    padding: 1rem .75rem;
+    pointer-events: none;
+    border: 1px solid transparent;
+    transform-origin: 0 0;
+    transition: opacity .1s ease-in-out, transform .1s ease-in-out;
+    font-size: 14px;
+    opacity: 0.85;
+}
+
+.section-select>label
+{
+    @media screen and (min-width: 768px) {
+        left: 0px !important;
+    }
+}
+
+.mobile-input::-webkit-outer-spin-button,
+.mobile-input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+/* ------------------assgin table------------------                     */
+.section-dis{
+    pointer-events: none;
+    background-color: rgba(211, 211, 211, 0.486);
+}
+
+.waiting-token-font
+{
+    font-size: 15px;
+    font-weight: bold;
+    color: grey;
+}
+
+.waiting-token-font thead
+{
+    color: rgb(75, 75, 75);
+}
+
+.waiting-list-table tbody > tr
+{
+    line-height: 2;
+}
+
+.total-tokan
+{
+    font-size: 12px;
+    text-align: center;
+    padding: 2px 6px;
+    font-weight: bold;
+    color: white;
+    background-color: grey;
+    border-radius: 100%;
+}
+
+
+/* Modal CSS */
+.save-cancel-btn{
+    margin-left: 5px;
+    height: 40px;
+    width: 80px;
+    border-radius: 3px;
+    font-weight: 600;
+}
+
+.save-btn{
+    background-color: #0066A7;
+    border: 1px solid #0066A7;
+    color: white;
+}
+
+.cancel-btn{
+    background-color: white;
+    color: #0066A7;
+    border: 1px solid #0066A7;
+}
+
+.form-select
+{
+    width: 230px !important;
+    outline: none !important;
+}
+
+.form-select:focus
+{
+    box-shadow: none !important;
+    outline: none !important;
+}
+
+.token-assign-offcanvas .form-floating>label {
+    position: absolute;
+    top: 0;
+    left: 12px;
+    height: 100%;
+    padding: 1rem .75rem;
+    pointer-events: none;
+    border: 1px solid transparent;
+    transform-origin: 0 0;
+    transition: opacity .1s ease-in-out, transform .1s ease-in-out;
+    font-size: 14px;
+    opacity: 0.85;
+}
+
+
+/* waiting list modal  */
+.token-generate-modal .form-floating>label {
+    position: absolute;
+    top: 0;
+    left: 12px !important;
+    height: 100%;
+    padding: 1rem .75rem;
+    pointer-events: none;
+    border: 1px solid transparent;
+    transform-origin: 0 0;
+    transition: opacity .1s ease-in-out, transform .1s ease-in-out;
+    font-size: 14px;
+    opacity: 0.85;
+}
+
+.select-section>label
+{
+    @media screen and (min-width: 768px) {
+        left: 0px !important;
+    }
+}

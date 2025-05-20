@@ -1,0 +1,102 @@
+.order-container {
+    background-color: #F2F2F2;
+    padding: 20px 20px;
+}
+
+.special-color {
+    color: #0066A7;
+}
+
+.orderStatusBox{
+    background-color: #add8e6;
+    color: #015f99;
+    font-size: 12px;
+    font-weight: 600;
+    max-width: 150px;
+    padding: 2px 2px;
+    border-radius: 2px;
+}
+
+.back_btn{
+    background-color: transparent;
+    color: #0066A7 !important;
+    border: 2px solid #0066A7;
+    border-radius: 4px;
+    height: fit-content;
+    padding: 8px 20px !important;
+    text-align: center;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-decoration: none;
+}
+
+.orderBorderRadius{
+    border-radius: 8px;
+}
+
+.order_header{
+    color: #0068a9;
+}
+
+#orderDetailOuter{
+    width: 70%;
+}
+
+#export-btn {
+    background-color: #0066A7;
+    color: white;
+    border-radius: 4px;
+    padding: 10px;
+    text-align: center;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.special-fs{
+    font-size: 15px !important;
+}
+
+.special-fss{
+    font-size: 14px !important;
+}
+
+
+.special-opacity{
+    opacity: 0.90;
+}
+
+.special-opacityy{
+    opacity: 0.95;
+}
+
+.special-opacityyy{
+    opacity: 1;
+    color: rgb(29, 29, 29);
+    font-weight: 500 !important;
+    font-size: 12px !important;
+
+}
+
+
+@media (max-width: 1199px) {
+    #orderDetailOuter{
+        width: 80%;
+    }
+}   
+  
+@media (max-width: 991px) {
+    #orderDetailOuter{
+        width: 90%;
+    }
+}   
+
+.detail-color{
+    color: rgb(53, 53, 53);
+    font-size: 15px;
+    font-weight: 500;
+    
+}
+    
+  

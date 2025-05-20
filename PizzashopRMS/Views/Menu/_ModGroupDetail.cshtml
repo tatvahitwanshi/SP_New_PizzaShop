@@ -1,0 +1,92 @@
+
+<div class="justify-content-evenly m-4">
+    <div class="d-flex justify-content-between mt-4">
+        <h4 class="text-muted">@Model.ModifierGroupName</h4>
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+            class="deleteOneGroup bi bi-trash3-fill text-muted" viewBox="0 0 16 16" data-modgroupid="@Model.ModifierGroupId">
+            <path
+                d="M11 1.5v1h3.5a.5.5 0 0 1 0 1h-.538l-.853 10.66A2 2 0 0 1 11.115 16h-6.23a2 2 0 0 1-1.994-1.84L2.038 3.5H1.5a.5.5 0 0 1 0-1H5v-1A1.5 1.5 0 0 1 6.5 0h3A1.5 1.5 0 0 1 11 1.5m-5 0v1h4v-1a.5.5 0 0 0-.5-.5h-3a.5.5 0 0 0-.5.5M4.5 5.029l.5 8.5a.5.5 0 1 0 .998-.06l-.5-8.5a.5.5 0 1 0-.998.06m6.53-.528a.5.5 0 0 0-.528.47l-.5 8.5a.5.5 0 0 0 .998.058l.5-8.5a.5.5 0 0 0-.47-.528M8 4.5a.5.5 0 0 0-.5.5v8.5a.5.5 0 0 0 1 0V5a.5.5 0 0 0-.5-.5" />
+        </svg>
+    </div>
+    <div class="d-flex gap-4 justify-content-between mt-2">
+        <div class="" style="width: 30%;">
+            <select class="form-select mb-3 border rounded-pill min-Select  " value="@Model.min">
+                @if(Model.min == null){
+                    <option value=0 selected>Min</option>
+                }
+
+                @for(int i=1;i<=Model.ItemShows.Count;i++)
+                {
+                    <option value="@i" selected="@(Model.min == i)">@i</option>
+                }
+            </select>
+        </div>
+        
+        <div class="" style="width: 30%;">
+            <select class="form-select mb-3 border rounded-pill max-Select " value="@Model.max">
+                @if(Model.max == null){
+                    <option value=0 selected>Max</option>
+                }
+
+                @for(int i=1;i<=Model.ItemShows.Count;i++)
+                {
+                    <option value="@i" selected="@(Model.max == i)">@i</option>
+                }
+            </select>
+        </div>
+    </div>
+    <div class=" mt-2">
+        <ul class="" style="padding-left:0 !important">
+            @foreach (var item in Model.ItemShows)
+            {
+                <li class="d-flex justify-content-between">
+                    <span>@item.ModifierItemName</span>
+                    <span>@item.Rate</span>
+                </li>
+            }
+        </ul>
+    </div>
+</div>
+
+
+<script>
+    // Handle delete button click inside dynamically loaded content
+    $('#modifierGroupDetail').on('click', '.deleteOneGroup', function () {
+        var modifierGroupDiv = $(this).closest('.mod-group-detail'); // Get the parent div
+        var modifierGroupId = modifierGroupDiv.attr('class').match(/mod-group-(\d+)/)[1]; // Extract ID
+
+        // Remove the group detail div
+        modifierGroupDiv.remove();
+
+        // Uncheck the corresponding checkbox
+        $(`input[name="modgroupCheckbox"][value="${modifierGroupId}"]`).prop('checked', false);
+    });
+
+        // Handle delete button click inside dynamically loaded content
+    $('#editmodifierGroupDetail').on('click', '.deleteOneGroup', function () {
+        var modifierGroupDiv = $(this).closest('.mod-group-detail-edit'); // Get the parent div
+        var modifierGroupId = modifierGroupDiv.attr('class').match(/mod-group-(\d+)/)[1]; // Extract ID
+
+        // Remove the group detail div
+        modifierGroupDiv.remove();
+
+        // Uncheck the corresponding checkbox
+        $(`input[name="modgroupCheckbox"][value="${modifierGroupId}"]`).prop('checked', false);
+    });
+
+    $(document).on('change', '.min-Select, .max-Select', function () {
+        var container = $(this).closest('.justify-content-evenly'); // Find the closest container
+        var min = parseInt(container.find('.min-Select').val(), 10);
+        var max = parseInt(container.find('.max-Select').val(), 10);
+    
+        // Check if Min is greater than Max
+        if (min > max) {
+            toastr.error("Min value cannot be greater than Max value.");
+            // Reset to a valid state
+            container.find('.min-Select').val(max);
+            container.find('.max-Select').val(min);
+        }
+    });
+
+   
+</script>

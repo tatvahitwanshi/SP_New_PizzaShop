@@ -1,0 +1,70 @@
+@model DataAccessLayer.ViewModels.TaxesFeesViewModel
+
+<div class="modal-content">
+    <div class="modal-body">
+        <form asp-action="EditTax" asp-controller="TaxesFees" method="post" id="editTaxForm">
+            <div class="d-flex justify-content-between">
+                <div class="fw-bold fs-4">Edit Tax</div>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="row pe-2 mt-2">
+                <div class="col-12">
+                    <div class="row">
+                        <input type="hidden" class="form-control" asp-for="AddEditTaxe.TaxesId">
+                        <div class="col-12 form-floating mt-3">
+                            <input type="text" class="form-control" asp-for="AddEditTaxe.Taxname" placeholder="Name">
+                            <label asp-for="AddEditTaxe.Taxname">Name*</label>
+                            <span asp-validation-for="AddEditTaxe.Taxname" class="text-danger"></span>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 col-12 form-floating mt-3">
+                            <select class="form-select" id="itemTypeDropdown" asp-for="AddEditTaxe.Taxtype"
+                                aria-label="Select Tax Type" required>
+                                <option disabled selected>Select Tax Type</option>
+                                <option value="Percentage">Percentage</option>
+                                <option value="Amount">Amount</option>
+                            </select>
+                            <label for="itemTypeDropdown">Tax Type*</label>
+                            <span asp-validation-for="AddEditTaxe.Taxtype" class="text-danger"></span>
+                        </div>
+                        <div class="col-md-6 col-12 form-floating mt-3">
+                            <input type="number" class="form-control" asp-for="AddEditTaxe.Taxvalue"
+                                placeholder="Tax Value" min="0" step="0.01" required>
+                            <label asp-for="AddEditTaxe.Taxvalue">Tax Value*</label>
+                            <span asp-validation-for="AddEditTaxe.Taxvalue" class="text-danger"></span>
+                        </div>
+                    </div>
+                    <div class="d-flex">
+                        <div class="form-check form-switch d-flex align-items-center me-2 mt-3">
+                            <input class="form-check-input" type="checkbox" asp-for="AddEditTaxe.Isenabled">
+                            <label class="form-check-label ms-2" asp-for="AddEditTaxe.Isenabled">Is Enabled</label>
+                            <span asp-validation-for="AddEditTaxe.Isenabled" class="text-danger"></span>
+                        </div>
+                        <div class="form-check form-switch d-flex align-items-center me-2 mt-3">
+                            <input class="form-check-input" type="checkbox" asp-for="AddEditTaxe.Isdefault">
+                            <label class="form-check-label ms-2" asp-for="AddEditTaxe.Isdefault">Default</label>
+                            <span asp-validation-for="AddEditTaxe.Isdefault" class="text-danger"></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="d-flex justify-content-end mt-3">
+                <button type="submit" class="btn text-white me-2" style="background-color: #0066A7;">Save</button>
+                <button type="button" class="btn" style="border-color: #0066A7; color: #0066A7;"
+                    data-bs-dismiss="modal">Cancel</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.5/jquery.validate.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validation-unobtrusive/4.0.0/jquery.validate.unobtrusive.min.js"></script>
+
+

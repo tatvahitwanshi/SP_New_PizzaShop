@@ -1,0 +1,179 @@
+<div class="table-responsive">
+    <table class="table">
+        <thead>
+            <tr>
+                <th>
+                    Name
+                    <a href="@Url.Action("UserListView", new { sortBy = "name", sortOrder = "asc" })"
+                        style="text-decoration: none;">
+                        <i
+                            class="bi bi-arrow-up @(Model.sortBy as string == "name" && Model.sortOrder as string == "asc" ? "text-primary" : "text-muted")"></i>
+                    </a>
+                    <a href="@Url.Action("UserListView", new { sortBy = "name", sortOrder = "desc" })">
+                        <i
+                            class="bi bi-arrow-down @(Model.sortBy as string == "name" && Model.sortOrder as string == "desc" ? "text-primary" : "text-muted")"></i>
+                    </a>
+                </th>
+                <th>Email</th>
+                <th>Phone</th>
+                <th>
+                    Role
+                    <a href="@Url.Action("UserListView", new { sortBy = "role", sortOrder = "asc" }) "
+                        style="text-decoration: none;">
+                        <i
+                            class="bi bi-arrow-up @(Model.sortBy as string == "role" && Model.sortOrder as string == "asc" ? "text-primary" : "text-muted")"></i>
+                    </a>
+                    <a href="@Url.Action("UserListView", new { sortBy = "role", sortOrder = "desc" })">
+                        <i
+                            class="bi bi-arrow-down @(Model.sortBy as string == "role" && Model.sortOrder as string == "desc" ? "text-primary" : "text-muted")"></i>
+                    </a>
+                </th>
+                <th>Status</th>
+                @if(ViewBag.Permissions[PermissionConst.CanAddEdit] || ViewBag.Permissions[PermissionConst.CanDelete])
+                {
+                    <th>Action</th>
+                }
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var user in Model.UserList)
+            {
+                <tr>
+                    <td>
+                        @if (user.Profilepic != null)
+                        {
+                            <img src="@Url.Content(user.Profilepic)" alt="" style="height: 3vh;">
+
+                        }
+                        else
+                        {
+                            <img src="~/images/Default_pfp.svg.png" alt="" style="height: 3vh;">
+
+                        }
+                        @user.Firstname
+                    </td>
+                    <td>@user.Email</td>
+                    <td>@user.Phone</td>
+                    <td>@user.RoleName</td>
+                    <td>
+                        <button class="rounded-pill text-white align-self-center"
+                            style="background-color: @((user.Isactive ?? false) ? "rgba(148, 193, 80, 0.845)" : "red"); border: none; width: 80px;">
+                            @((user.Isactive ?? false) ? "Active" : "Inactive")
+                        </button>
+                    </td>
+                    @if(ViewBag.Permissions[PermissionConst.CanAddEdit] || ViewBag.Permissions[PermissionConst.CanDelete])
+                    {
+                        <td>
+                            <div class="d-flex">
+                                @if (ViewBag.Permissions[PermissionConst.CanAddEdit])
+                                {
+                                    <a asp-action="EditUserView" asp-controller="UserList" asp-route-userId="@user.Userid"
+                                        style="text-decoration: none; color: grey;">
+                                        <i class="bi bi-pen"></i>
+                                    </a>
+                                }
+                                else
+                                {
+                                    <img src="~/images/pen-slash.svg" alt="" class="img-fluid" style="width: 16px; height: 16px;">
+                                }
+                                @if (ViewBag.Permissions[PermissionConst.CanDelete])
+                                {
+                                    <a href="" class="ms-4 delete-user" style="text-decoration: none; color: grey;"
+                                        data-bs-toggle="modal" data-bs-target="#staticBackdrop1" onclick="DeleteUser(@user.Userid)">
+                                        <i class="bi bi-trash"></i>
+                                        @* data-userid="@user.Userid" *@
+                                    </a>
+                                }
+                                else
+                                {
+                                    <img src="~/images/trash-slash.svg" alt="" class="img-fluid" style="width: 16px; height: 16px;">
+                                }
+                            </div>
+                        </td>
+                    }
+                </tr>
+            }
+        </tbody>
+
+    </table>
+</div>
+<div class="main-pagination  p-1">
+    <div class="item-show ">
+        <nav aria-label="Page navigation example">
+            <div class="pagination ">
+                <span class="align-self-center">Items Per Page :</span>
+                <select class="form-select form-select-sm ms-2 align-self-center" aria-label="Small select example"
+                    onchange="updateItemsPerPage()" style=" width: unset; " id="itemsPerPage">
+                    @if (Model.PageSize != null)
+                    {
+                        @* <option value="1" selected="@(Convert.ToInt32(Model.PageSize) == 1 ? true : false)">1
+                        </option>
+                        <option value="2" selected="@(Convert.ToInt32(Model.PageSize) == 2 ? true : false)">2
+                        </option> *@
+                        <option value="5" selected="@(Convert.ToInt32(Model.PageSize) == 5 ? true : false)">5
+                        </option>
+                        <option value="10" selected="@(Convert.ToInt32(Model.PageSize) == 10 ? true : false)">10
+                        </option>
+                        <option value="@Model.Count"
+                            selected="@(Convert.ToInt32(Model.PageSize) == Convert.ToInt32(Model.Count) ? true : false)">
+                            All
+                        </option>
+
+                    }
+                </select>
+            </div>
+        </nav>
+    </div>
+    <div class="showing-page">
+        <nav aria-label="Page navigation example ">
+            <div class="pagination ">
+                <span class="align-self-center ms-2">Showing
+                    @{
+                        var pageNumber = Convert.ToInt32(Model.PageNumber);
+                        var pageSize = Convert.ToInt32(Model.PageSize);
+                        var totalCount = Convert.ToInt32(Model.Count);
+
+                        var startRecord = (pageNumber - 1) * pageSize + 1;
+                        var endRecord = pageNumber * pageSize;
+
+                        if (endRecord > totalCount)
+                            endRecord = totalCount;
+
+                        if (totalCount == 0)
+                        {
+                            startRecord = 0;
+                            endRecord = 0;
+                        }
+                    }
+                    <span style="color: green;" class="me-1">@startRecord - @endRecord</span> of
+                    <span style="color: red;" class="ms-1">@Convert.ToInt32(Model.Count)</span>
+
+                </span>
+                @* <a href="@Url.Action("UserListView")?PageSize=@Convert.ToInt32(Model.PageSize)&PageNumber=@(Convert.ToInt32(Model.PageNumber) - 1)&SortColumn=@Model.sortBy&SortDirection=@Model.sortOrder&SearchKey=@Model.SearchKey"
+                    style="text-decoration: none;"> *@
+                <button
+                    class="btn border ms-2 align-self-center pagination-button @(pageNumber == 1 ? "disabled" : "") "
+                    data-page="@((Convert.ToInt32(Model.PageNumber) - 1))">
+                    <i class="bi bi-chevron-left"></i>
+                </button>
+                @* </a> *@
+
+                <!-- Next Button -->
+                @* <a href="@Url.Action("UserListView")?PageSize=@Convert.ToInt32(Model.PageSize)&PageNumber=@(Convert.ToInt32(Model.PageNumber) + 1)&SortColumn=@Model.sortBy&SortDirection=@Model.sortOrder&SearchKey=@Model.SearchKey"
+                    style="text-decoration: none;"> *@
+                <button
+                    class="btn border ms-2 align-self-center pagination-button @((pageNumber * pageSize >= totalCount) ? "disabled" : "") "
+                    data-page="@((Convert.ToInt32(Model.PageNumber) + 1))">
+                    <i class="bi bi-chevron-right"></i>
+                </button>
+                @* </a> *@
+            </div>
+        </nav>
+    </div>
+</div>
+<script>
+    function DeleteUser(userId) {
+        console.log(userId);
+        $('#inputdeletexy').val(userId);
+    }
+</script>

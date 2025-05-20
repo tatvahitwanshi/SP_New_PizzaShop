@@ -1,0 +1,110 @@
+@model DataAccessLayer.ViewModels.CustomerDetailsList;
+
+<style>
+    #customerModal .modal-content{
+        border-radius: 7px;
+    }
+    #customerModal .modal-body{
+        background-color: #f8f9fa;
+        border-radius: 7px;
+    }
+
+    #customerModal th{
+        opacity: 0.85;
+    }
+
+    #customerModal table{
+        background-color: white;
+        padding : 10px;
+        border-radius: 5px;
+        margin-top: 10px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    }
+
+    #customerModal .tileClass
+    {
+        background-color: #fcfcfc;
+        border-radius: 5px;
+        padding: 5px 8px;
+        margin-bottom: 3px !important;
+        box-shadow: 0 0 10px rgba(69, 68, 68, 0.1);
+    }
+
+    #customerModal strong{
+        opacity: 0.85;
+    }
+</style>
+
+
+<!-- Bootstrap Modal -->
+<div class="modal fade" id="customerModal" tabindex="-1" aria-labelledby="customerModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content">
+            <div class="modal-header mb-0">
+                <h5 class="modal-title fw-bold text-secondary" id="customerModalLabel">Customer History</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="row g-3 my-1">
+                    <div class="col-md-6 my-1">
+                        <div class="d-flex justify-content-between align-items-center tileClass"> 
+                            <strong>Name:</strong> <span id="custName">@Model.CustomerName</span>
+                        </div>
+                    </div>
+                    <div class="col-md-6 my-1">
+                        <div class="d-flex justify-content-between align-items-center tileClass"> 
+                            <strong>Average Bill:</strong> <span id="custAvgBill">@Model.AvgBill</span>
+                        </div>
+                    </div>
+                    <div class="col-md-6 my-1">
+                        <div class="d-flex justify-content-between align-items-center tileClass"> 
+                            <strong>Mobile Number:</strong> <span id="custPhone">@Model.PhoneNumber</span>
+                        </div>
+                    </div>
+                    <div class="col-md-6 my-1">
+                        <div class="d-flex justify-content-between align-items-center tileClass"> 
+                            <strong>Coming Since:</strong><span id="custPhone">@Model.ComingSince</span>
+                        </div>
+                    </div>
+                    <div class="col-md-6 my-1">
+                        <div class="d-flex justify-content-between align-items-center tileClass"> 
+                            <strong>Max Order:</strong><span id="custPhone">@Model.MaxBill</span>
+                        </div>
+                    </div>
+                    <div class="col-md-6 my-1">
+                        <div class="d-flex justify-content-between align-items-center tileClass"> 
+                            <strong>Visits:</strong><span id="custPhone">@Model.Visits</span>
+                        </div>
+                    </div>
+                </div>
+
+
+                
+                <table class="table text-center mb-0">
+                    <thead>
+                        <tr>
+                            <th>Order Date</th>
+                            <th>Order Type</th>
+                            <th>Payment</th>
+                            <th>Items</th>
+                            <th>Amount</th>
+                        </tr>
+                    </thead>
+                    <tbody id="orderTableBody">
+                        <!-- Orders will be populated here -->
+                        @foreach(var order in Model.Orders)
+                        {
+                            <tr>
+                                <td>@order.OrderDate</td>
+                                <td>@order.OrderType</td>
+                                <td>@order.PaymentType</td>
+                                <td>@order.TotalItem</td>
+                                <td>@order.TotalAmount</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>

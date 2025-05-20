@@ -1,0 +1,184 @@
+@model DataAccessLayer.ViewModels.OrderDetailsViewModel
+@{
+    Layout = "~/Views/Shared/_LayoutCustom.cshtml";
+    ViewData["Title"] = " Orders Page";
+    ViewBag.Active = "Orders";
+}
+
+<link rel="stylesheet" href="~/css/orderdetails.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+<div class="order-container  d-flex justify-content-center">
+    <div id="orderDetailOuter">
+        <div class=" col d-flex flex-row justify-content-between user_list_header mb-4">
+            <div class="special-color">
+                <span class="fs-2 fw-bold">Order-Details</span>
+            </div>
+            <a asp-action="OrdersView" asp-controller="Orders" style="max-width: 150px;"
+                class="btn back_btn special-color d-flex align-items-center justify-content-center p-0 fw-bold">
+                Back
+            </a>
+        </div>
+
+        <!-- Order Summary Division-->
+        <div class="bg-white p-3 orderBorderRadius">
+            <div class="row align-items-center mb-3">
+                <!-- Left side: Order Summary & Status -->
+                <div class="col-12 col-sm-8 d-flex flex-column flex-sm-row align-items-start align-items-sm-center mb-2 mb-sm-0">
+                    <span class="fs-4 fw-bold me-sm-2">Order Summary</span>
+                    <span class="orderStatusBox">@Model.OrderStatus</span>
+                </div>
+
+                <!-- Right side: Export Button -->
+                <div class="col-12 col-sm-4 d-flex justify-content-sm-end justify-content-start">
+                    <a class="d-flex align-items-center justify-content-center px-3 fs-6 export-button" id="export-btn"
+                    asp-action="ExportToPdf" asp-route-orderId="@Model.OrderId"
+                    style="height: 44px; text-decoration: none;">
+                        <img src="/images/export-icon.png" alt="" style="filter: invert(1); height: 17px;">
+                        <span class="ms-2 fw-bold ">Export</span>
+                    </a>
+                </div>
+            </div>
+            @{
+                var time = "";
+                if(Model.CompletedTime == null)
+                {
+                    time = "Order is not completed yet";
+                }
+                else{
+                    time = $"{(int)(Model.CompletedTime - Model.CreatedDate).Value.TotalHours} hour {(Model.CompletedTime - Model.CreatedDate).Value.Minutes} minutes";
+                }
+            }
+            <p class="special-fs mb-1"><span class="fw-bold special-opacity">Invoice No. :</span> 
+                @if(Model.InvoiceNumber==null)
+                {
+                     <span style="color: #0066A7; font-weight: 500;">Not Generated</span>
+                }
+                else
+                {
+                    @Model.InvoiceNumber
+                }
+            </p>
+            <div class="d-flex flex-column flex-lg-row flex-wrap special-fs">
+                <p class="me-3 mb-1"><span class="fw-bold special-opacity special-fs">Paid On :</span> 
+                @if(Model.PaidOn == null)
+                {
+                    <span style="color: #0066A7; font-weight: 500;">Pending Payment</span>
+                }
+                else
+                {
+                    <span>@Model.PaidOn</span>
+                }
+                <p class="me-3 mb-1"><span class="fw-bold special-opacity special-fs">Placed On :</span> @Model.CreatedDate</p>
+                <p class="me-3 mb-1"><span class="fw-bold special-opacity special-fs">Modified On : </span>not modified</p>
+                <p class="me-3 mb-1"><span class="fw-bold special-opacity special-fs">Order Duration : </span>@time</p>
+            </div>
+        </div>
+
+        <div class="d-flex flex-column flex-sm-row mt-3 row gap-3 p-0 m-0 mb-3">
+            <div class="bg-white orderBorderRadius col p-3">
+                <div class="d-flex align-items-center justify-content-start mb-3">
+                    <i class="bi bi-person-lines-fill"></i>
+                    <span class=" ms-2 fs-5 fw-bold me-2">Customer Details</span>
+                </div>
+                <div class="mb-1 p-0 detail-color">Name: @(Model.Customer?.Name)</div>
+                <div class="mb-1 p-0 detail-color">Phone: @(Model.Customer?.Phone)</div>
+                <div class="mb-1 p-0 detail-color">No of Persons: @(Model.Personcount)</div>
+                <div class="mb-1 p-0 detail-color">Email: @(Model.Customer?.Email)</div>
+            </div>
+            <div class="bg-white orderBorderRadius col p-3">
+                <div class="d-flex align-items-center justify-content-start mb-3">
+                    <img src="~/images/diningtable.png" alt="" height="20px">
+                    <span class=" ms-2 fs-5 fw-bold me-2">Table Details</span>
+                </div>
+                <div class="mb-1 p-0 detail-color">Table: <span>@(Model.Tables?.TableList != null ? string.Join(", ", Model.Tables.TableList) : string.Empty)</span></div>
+                <div class="mb-1 p-0 detail-color">Section: @Model.Tables?.SectionName</div>
+            </div>
+        </div>
+        <div class="bg-white p-3 orderBorderRadius container-fluid">
+            <div class="mb-2">
+                <span class="fs-5 fw-bold">Order Items</span>
+            </div>
+            <div class="table-responsive">
+                <table class="table">
+                    <thead>
+                        <tr class="text-center special-opacityy">
+                            <th class="text-start">Sr.No</th>
+                            <th class="text-start ms-5" >Item</th>
+                            <th>Quantity</th>
+                            <th>Price</th>
+                            <th class="text-end">Total Amount</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @for(int i=0; i<Model.Dishes?.Count; i++)
+                        {
+                            <tr class="text-center">
+                                <td class="text-start">@(i+1)</td>
+                                <td class="text-start">
+                                    @Model.Dishes[i].Itemname
+                                    <ul class="mb-0">
+                                        @for(int j=0; j<Model.Dishes[i].modifiers?.Count; j++)
+                                        {
+                                            <li>@Model.Dishes[i].modifiers?[j].Modifiername</li>
+                                        }
+                                    </ul>
+                                </td>
+                                <td>
+                                    <p class="m-0">@Model.Dishes[i].Quantity</p>
+                                    @for(int j=0; j<Model.Dishes[i].modifiers?.Count; j++)
+                                    {
+                                        <p class="m-0">@Model.Dishes[i].modifiers?[j].Quantity</p>
+                                    }
+                                </td>
+                                <td>
+                                    <p class="m-0">@Model.Dishes[i].Price</p>
+                                    @for(int j=0; j<Model.Dishes[i].modifiers?.Count; j++)
+                                    {
+                                        <p class="m-0">@Model.Dishes[i].modifiers?[j].Price</p>
+                                    }
+                                </td>
+                                <td class="text-end">
+                                    <p class="m-0">@Model.Dishes[i].Total</p>
+                                    @for(int j=0; j<Model.Dishes[i].modifiers?.Count; j++)
+                                    {
+                                        <p class="m-0">@Model.Dishes[i].modifiers?[j].Total</p>
+                                    }
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+            <div class="d-flex justify-content-end">
+                <div style="width: 150px;" class="special-fs">
+                    <div class="d-flex justify-content-between align-items-center fw-bold">
+                        <div class="special-fss fw-bold">Subtotal:</div>
+                        <div>₹@Model.SubTotal.00</div>
+                    </div>
+                    
+                    @if (Model?.Taxes != null && Model.Taxes.Any())
+                    {
+                        @foreach(var tax in Model.Taxes)
+                        {
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div class="special-fs special-opacityyy @(Model.OrderStatus =="Cancelled" ? "text-muted": "") ">@tax.Taxname:</div>
+                                <div class="@(Model.OrderStatus !="Completed" ? "text-muted": "")">₹@tax.AppliedTax</div>
+                            </div>
+                        }
+                    }
+                    
+                    <hr class="p-0 mx-0 my-2">
+                    <div class="d-flex justify-content-between align-items-center mt-0 fw-bold">
+                        <div class="special-fss fw-bold">Total:</div>
+                        <div>@Model?.Total</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section scripts {
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+}
+

@@ -1,0 +1,51 @@
+@model DataAccessLayer.ViewModels.WaitingListViewModel
+
+
+<!-- Assign Token Modals -->
+<div class="modal fade" id="assignTokenModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <form class="modal-body" method="post" id="AssignTokenForm">
+                <div class="d-flex justify-content-between mb-3">
+                    <h1 class="modal-title fs-5 fw-bold text-secondary" id="exampleModalLabel">Assign Table</h1>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <input type="text"  id="tokenIdForAssign" asp-for="AssignToken.TokenId" hidden>
+
+                <div class="d-flex justify-content-center gap-1">
+                    <div class="">
+                        <select class="form-select custom-select mb-2" id="sectionSelect" asp-for="AssignToken.SectionId" onchange="setTableDropDown(this.value)">
+                            <option value="" selected disabled>Section* (Required)</option>
+                            @for(var i = 1; i < Model.SectionList.Count; i++)
+                            {
+                                <option value="@Model.SectionList[i].SectionId">@Model.SectionList[i].SectionName</option>
+                            }
+                        </select>
+                        <input type="hidden" asp-for="AssignToken.SectionId" id="sectionSelectHide">
+                        <span class="text-danger"></span>
+                    </div>
+                    <div class="">
+                        <select class="form-select custom-select mb-2" id="tableSelect" asp-for="AssignToken.TableId">
+                            <option value="" selected disabled>Table* (Required)</option>
+                           
+                        </select>
+                        <span asp-validation-for="AssignToken.TableId" class="text-danger"></span>
+                    </div>
+                </div>
+
+                <input type="text" id="capacity" hidden>
+                <div class="d-flex justify-content-end">
+                    <button type="submit" class="save-cancel-btn fw-semibold save-btn">Assign</button>
+                    <button type="button" class="save-cancel-btn fw-semibold cancel-btn" data-bs-dismiss="modal">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}
+
+
+

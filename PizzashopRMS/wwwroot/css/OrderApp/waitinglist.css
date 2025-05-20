@@ -1,0 +1,174 @@
+.special-color{
+    color: #0066A7;
+}
+
+.special-border
+{
+    border: 2px solid #0066A7;
+    border-radius: 5px;
+}
+
+.waiting-list-container
+{
+    background-color: #F2F2F2;
+    padding: 20px 40px;
+}
+/* ----------------------------------- Section Tabs ----------------------------------  */
+.waiting-list-tab{
+    padding: 3px 15px;
+    padding-bottom: 0px;
+    margin: 0px 0px !important;
+    margin-bottom: 12px !important;
+    box-shadow: 0px 1px 3px rgba(85, 85, 85, 0.3);
+}
+.waiting-list-tab .nav {
+    overflow-x: auto;
+    white-space: nowrap;
+    flex-wrap: nowrap;
+    -webkit-overflow-scrolling: touch;
+}
+
+.nav-link {
+    border: none;
+    border-bottom: 2px solid transparent;
+    margin-right: 10px;
+    background-color: white;
+}
+
+.tab-btn{
+    color:black !important;
+    font-size: 17px !important;
+    padding: 10px 5px !important;
+    font-weight: bold;
+    opacity: 0.85;
+}
+
+.tab-btn:hover{
+    color: rgb(43, 41, 41) !important;
+    opacity: 0.75;
+}
+
+
+.nav-link.active {
+    border-bottom: 3px solid #0066A7;
+    color: #0066A7 !important;
+    font-weight: 600;
+    opacity: 1;
+}
+
+.nav-link:focus {
+    box-shadow: none;
+}
+
+.waiting-token-btn
+{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 15px;
+    border-radius: 3px;
+    padding: 5px 9px;
+    font-weight: 600;
+    cursor: pointer;
+    background-color: none;
+    color: #0066A7;
+    border: 1px solid #0066A7;
+}
+
+
+/*----------- Waiting List -------- */
+.waiting-token-font
+{
+    font-size: 15px;
+    font-weight: bold;
+    color: grey;
+}
+
+.waiting-token-font thead
+{
+    color: rgb(75, 75, 75);
+}
+
+.waiting-list-table tbody > tr
+{
+    line-height: 2;
+}
+
+.total-tokan
+{
+    font-size: 12px;
+    text-align: center;
+    padding: 2px 6px;
+    font-weight: bold;
+    color: white;
+    background-color: grey;
+    border-radius: 100%;
+}
+
+
+
+/* Modal CSS */
+.save-cancel-btn{
+    margin-left: 5px;
+    height: 40px;
+    width: 80px;
+    border-radius: 3px;
+    font-weight: 600;
+}
+
+.save-btn{
+    background-color: #0066A7;
+    border: 1px solid #0066A7;
+    color: white;
+}
+
+.cancel-btn{
+    background-color: white;
+    color: #0066A7;
+    border: 1px solid #0066A7;
+}
+
+.form-select
+{
+    width: 230px !important;
+    outline: none !important;
+}
+
+.form-select:focus
+{
+    box-shadow: none !important;
+    outline: none !important;
+}
+
+/* waiting list modal  */
+.token-generate-modal .form-floating>label {
+    position: absolute;
+    top: 0;
+    left: 12px;
+    height: 100%;
+    padding: 1rem .75rem;
+    pointer-events: none;
+    border: 1px solid transparent;
+    transform-origin: 0 0;
+    transition: opacity .1s ease-in-out, transform .1s ease-in-out;
+    font-size: 14px;
+    opacity: 0.85;
+}
+
+.section-select>label
+{
+    @media screen and (min-width: 768px) {
+        left: 0px !important;
+    }
+}
+
+.mobile-input::-webkit-outer-spin-button,
+.mobile-input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+.read-only-section {
+    pointer-events: none;
+    background-color: rgba(211, 211, 211, 0.712);
+}

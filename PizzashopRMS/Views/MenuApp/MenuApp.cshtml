@@ -1,0 +1,279 @@
+@model DataAccessLayer.ViewModels.MenuAppViewModel;
+
+@{
+    Layout = "~/Views/Shared/_OrderAppLayout.cshtml";
+    ViewData["Title"] = "Order Menu";
+    ViewBag.Active = "Menu";
+}
+<link rel="stylesheet" href="~/css/OrderApp/menuapp.css" asp-append-version="true" />
+
+
+<div class="container-fluid p-0 m-0">
+    <div class="row p-0 m-0">
+        <!-- Offcanvas Sidebar -->
+        <div class="offcanvas offcanvas-start d-lg-none" tabindex="-1" id="categoryOffcanvas"
+            aria-labelledby="categoryOffcanvasLabel" style="width: 300px;">
+            <div class="offcanvas-header">
+                <h5 class="offcanvas-title" id="categoryOffcanvasLabel">Categories</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+            </div>
+            <div class="offcanvas-body">
+                <div class="category-card" data-categoryid="-1" onclick="updateMenu(-1)">Favourite items</div>
+                <div class="category-card" data-categoryid="0" onclick="updateMenu(0)">All</div>
+                @if (Model.CategoryList != null)
+                {
+                    @foreach (var category in Model.CategoryList)
+                    {
+                        <div class="category-card" data-categoryid="@category.CategoryId"
+                            onclick="updateMenu(@category.CategoryId)">
+                            @category.CategoryName
+                        </div>
+                    }
+                }
+            </div>
+        </div>
+        <div class="col-2 p-0 d-none d-lg-block ">
+            <div class="d-flex flex-column fw-semibold ">
+                <div class="fw-bold mt-2 fs-4 category-name mb-1">Category</div>
+                <div class="category-list">
+                    <div class="category-card" data-categoryid="-1" onclick="updateMenu(-1)">Favourite items</div>
+                    <div class="category-card" data-categoryid="0" onclick="updateMenu(0)">All</div>
+                    @if (Model.CategoryList != null)
+                    {
+                        @foreach (var category in Model.CategoryList)
+                        {
+                            <div class="category-card" data-categoryid=@category.CategoryId
+                                onclick="updateMenu(@category.CategoryId)">
+                                @category.CategoryName
+                            </div>
+                        }
+                    }
+                </div>
+
+            </div>
+        </div>
+        <div class="col-12 col-lg-10 bg-light">
+            <div class="row p-2">
+                <div class="col-12 @(Model.TableId != -1 ? "col-xl-6" : "")">
+                    <div class=" items-order-container flex-grow-1 gap-2">
+
+                        <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap">
+                            <div class="search-box w-25 py-2 mt-2">
+                                <input type="text" placeholder="Search" id="search-input-for-items"
+                                    class="text-bark search-input" oninput="updateMenu(null, this.value)">
+                                <img src="~/images/search.png" alt="" class="search-img">
+                            </div>
+                            <div class=" d-flex justify-content-end gap-3 item-categories mt-2">
+                                <div class="d-flex gap-1 align-items-center">
+                                    <i class="bi bi-circle-fill text-success"></i>
+                                    <span>Vegetarian</span>
+                                </div>
+                                <div class="d-flex gap-1 align-items-center">
+                                    <i class="bi bi-circle-fill text-danger"></i>
+                                    <span>Non-Vegetarian</span>
+                                </div>
+                                <div class="d-flex gap-1 align-items-center">
+                                    <i class="bi bi-circle-fill text-warning"></i>
+                                    <span>Vegan</span>
+                                </div>
+                            </div>
+                            <button class="btn d-block d-lg-none m-3 text-white" style="background:#0066A7"
+                                type="button" data-bs-toggle="offcanvas" data-bs-target="#categoryOffcanvas"
+                                aria-controls="categoryOffcanvas">
+                                Categories
+                            </button>
+
+                        </div>
+
+                        <div id="itemValuesContainer">
+                            <!--Load all items here based on the category-->
+                        </div>
+                    </div>
+                </div>
+                <input type="hidden" value=@Model.TableId id="tableIdForCheck">
+                <!-------order appp-------->
+                @if (Model.TableId != -1)
+                {
+                    <div class="col-12 col-xl-6 order-app-module @(Model.TableId == -1 ? "d-none" : "")">
+                        <input type="text" id="OrderIdForInvoice" value="@Model?.TokenOrderDetails?.OrderId" hidden>
+                        <div class="shadow-lg rounded-3 p-2">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div class="d-flex gap-2">
+                                    <div class="d-flex align-self-center">
+                                        <img src="~/images/orderapp-table.svg" alt="" class="dining-table-img">
+                                    </div>
+                                    <div class="d-flex flex-column table-details">
+                                        <span>@Model?.TokenOrderDetails?.TableDetail?.SectionName</span>
+                                        <span><span class="fw-bold">Table: </span>@(string.Join(", ",
+                                                                                    Model?.TokenOrderDetails?.TableDetail?.TableList ?? new List<string?>()))</span>
+                                </div>
+                            </div>
+                            <div class="d-flex gap-2 justify-content-between align-items-center">
+                                <div class="d-flex gap-2">
+                                    <div class="threeicon align-content-center" onclick="openQRModal()">
+                                        <i class="bi bi-qr-code-scan icontext m-0 p-0"></i>
+                                    </div>
+                                    <div class="threeicon align-content-center" onclick="openCustomerDetailsModalPartial()">
+                                        <i class="bi bi-person-lines-fill icontext fw-bold m-0 p-0"></i>
+                                    </div>
+                                    <div class="threeicon align-content-center" onclick="giveInstruction(0)">
+                                        <i class="bi bi-chat-left-text icontext m-0 p-0" ></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="table-responsive">
+                            <table class="table table-borderless" id="OrderTable">
+                                <thead>
+                                    <tr>
+                                        <th style="width: 400px;">Items</th>
+                                        <th style="width: 100px;">Quantity</th>
+                                        <th style="width: 100px;">Amount</th>
+                                        <th></th>
+                                    </tr>
+                                </thead>
+                                <tbody id="item-rows-container">
+                                    <!-- Partial view content loaded here -->
+                                </tbody>
+                            </table>
+                        </div>
+                        <hr style="opacity: 0.1;">
+                        <div class="tax-container">
+                            @if(Model?.TokenOrderDetails?.Instruction != null)
+                            {
+                                <div id="main-instruction-container">
+                                    <span class="special-color fw-bold me-1">Instruction: </span>
+                                    <span id="main-instruction">@Model?.TokenOrderDetails?.Instruction</span>
+                                </div>
+                            }
+                            <div class="d-flex justify-content-between align-content-center fw-bold px-1 subtotal-card">
+                                <div>Sub Total</div>
+                                <div class="subtotal-value">₹ <span id="order-subtotal">0.00</span></div>
+                            </div>
+                            @if (Model.TaxList != null)
+                                {
+                                    @foreach (var tax in Model.TaxList)
+                                    {
+                                        <div class="d-flex justify-content-between align-content-center px-1 tax-card"
+                                            data-taxid=@tax.TaxesId data-taxvalue=@tax.Taxvalue data-taxvaluetype=@tax.Taxtype
+                                            data-defaulttax=@tax.Isdefault>
+
+                                            <div class="tax-name">
+                                                @if (tax.Isdefault == false)
+                                                {
+                                                    <input type="checkbox" class="tax-checkbox" onclick="calculateSubTotal()">
+                                                }
+                                                @tax.Taxname
+                                            </div>
+                                            <div class="tax-overall-value">
+                                                <span class="rupee-sign">₹</span>
+                                                <span class="tax-value">0.00</span>
+                                            </div>
+                                        </div>
+                                    }
+                                }
+                                <div
+                                    class="d-flex justify-content-between align-content-center fw-bold px-1 mt-3 total-card">
+                                    <div>Total</div>
+                                    <div class="total-value">
+                                        <span class="rupee-sign">₹</span>
+                                        <span id="order-total">0.00</span>
+                                    </div>
+                                </div>
+                                <div class="d-flex justify-content-between align-content-center fw-bold px-1 mt-3 total-card">
+                                    <div class="special-fss fw-bold">Payment Method:</div>
+                                    <div class="d-flex justify-content-end">
+                                        <div class="form-check form-check-inline">
+                                            <input class="form-check-input" type="radio" name="PaymentMethod" id="cash" value="Cash" checked> 
+                                            <label class="form-check-label" for="cash">Cash</label>
+                                        </div>
+                                        <div class="form-check form-check-inline">
+                                            <input class="form-check-input" type="radio"  name="PaymentMethod"" id="card" value="Card">
+                                            <label class="form-check-label" for="card">Card</label>
+                                        </div>
+                                        <div class="form-check form-check-inline">
+                                            <input class="form-check-input" type="radio"  name="PaymentMethod"" id="upi" value="UPI">
+                                            <label class="form-check-label" for="upi">UPI</label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="container">
+                                <div class="row justify-content-end mt-3 gx-2 gy-2 flex-wrap">
+                                    <div class="col-12 col-sm-6 col-md-4 col-lg-3">
+                                        <div class="btn mybtn fourbtns " onclick="PlaceOrder()">
+                                            @(Model?.TokenOrderDetails?.TokenORorder == "token" ? "Save" : "Update Order")
+                                        </div>
+                                    </div>
+                                    <div class="col-12 col-sm-6 col-md-4 col-lg-3">
+                                        <div class="btn myclearbtn fourbtns  @(Model?.TokenOrderDetails?.TokenORorder == "token" ? "disabled" : "")" onclick="completeOrder(@Model?.TokenOrderDetails?.Id)">Complete</div>
+                                    </div>
+                                    <div class="col-12 col-sm-6 col-md-4 col-lg-3" >
+                                        <a class="btn myclearbtn fourbtns " onclick="GenerateInvoiceComplete(@Model?.TokenOrderDetails?.OrderId)">Generate Invoice</a>
+                                    </div>
+                                </div>
+
+                                <div class="row justify-content-end mt-2 gx-2 gy-2">
+                                    <div class="col-12 col-sm-6 col-md-4 col-lg-3">
+                                        <div class="btn myclearbtn fourbtns @(Model?.TokenOrderDetails?.TokenORorder == "token" ? "disabled" : "")" onclick="CancelOrder(@Model?.TokenOrderDetails?.Id)">Cancel</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+
+
+<!-- Modifier List Modal -->
+<div class="modal fade " id="ModifierListModal" tabindex="-1" aria-labelledby="staticBackdropLabel"
+    aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content">
+            <div id="ModifierListModalContainer">
+                <!--Partial View-->
+
+
+            </div>
+
+            <div class="modal-footer py-2">
+                <button type="button" class="btn fw-semibold text-white @(Model.TableId == -1 ? "d-none" : "")" style="background-color: #0066A7;"
+                    onclick="SaveNewItem()">Add</button>
+                <button type="button" class="btn fw-semibold"
+                    style="border-color: #0066A7; color: #0066A7; text-decoration: none;"
+                    data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Instruction List Modal -->
+<partial name="_PartialInstructionModal" />
+
+<!---QR Modal----->
+<partial name="_PartialQRModal"/>
+
+<!-- Cancel Order-->
+<partial name="_PartialOrderCancelModal"/>
+
+<!-- Customer Details Modal -->
+<div id="customerDetailsModalContainer">
+    @* <partial name="_PartialCustomersDetail" /> *@
+</div>
+
+<!--Complete Order appp-------->
+<div id="completeOrderAppModalContainer">
+
+</div>
+
+<script id="main-model-json" type="application/json">
+    @Html.Raw(Json.Serialize(Model))
+</script>
+@section Scripts
+{
+        <script src="~/js/OrderApp/menuapp.js" asp-append-version="true"></script>
+        <partial name="_ValidationScriptsPartial" />
+}

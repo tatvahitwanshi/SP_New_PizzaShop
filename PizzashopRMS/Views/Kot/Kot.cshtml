@@ -1,0 +1,54 @@
+@model DataAccessLayer.ViewModels.KotViewModel
+@{
+    Layout = "~/Views/Shared/_OrderAppLayout.cshtml";
+    ViewData["Title"] = "KOT";
+    ViewBag.Active = "Kot";
+}
+<link rel="stylesheet" href="~/css/OrderApp/Kot.css" asp-append-version="true" />
+<div class="kot-container">
+
+    <!-- KOT -->
+    <div class="row px-0 d-flex justify-content-between mb-2">
+        <div class="col-sm-1 d-flex fs-2 fw-bold special-color">KOT</div>
+    </div>
+
+    <!-- Item Tab -->
+    <div class="row border rounded kot-list-tab bg-white">
+        <div class="d-flex nav" id="nav-tab" role="tablist" >
+            <button class="nav-link tab-btn active d-flex align-items-center" data-tab-id="0" data-order-status="@Model.OrderStatus">
+                <div>All</div>
+            </button>
+            @if (Model.CategoryList != null)
+            {
+                @foreach (var category in Model.CategoryList)
+                {
+                    <button class="nav-link tab-btn d-flex align-items-center"
+                            data-tab-id="@category.CategoryId">
+                        <div>@category.CategoryName</div>
+                    </button>
+                }
+            }
+        </div>
+    </div>
+
+    <div class="row kot-list-tab bg-white rounded" style="z-index: 1000;">
+        <div class="tab-content" id="tabContent">
+            <div class="tab-pane fade show active" id="default-tab">
+                Select a tab to view content
+            </div>
+        </div>
+    </div>
+     <!------ Pending quantities ------->
+    <div id="pendingOrdersContainer" class="kot-list-tab bg-white py-2">
+        
+    </div>
+
+</div>
+<div id="changeQuanityContainer">
+
+
+</div>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="~/js/OrderApp/kot.js" asp-append-version="true"></script>
+

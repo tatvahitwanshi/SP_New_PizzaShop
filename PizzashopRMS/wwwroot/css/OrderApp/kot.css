@@ -1,0 +1,211 @@
+.special-color{
+    color: #0066A7;
+}
+
+.kot-container
+{
+    background-color: #F2F2F2;
+    padding: 20px 40px;
+}
+@media (max-width: 768px) {
+    .kot-container {
+        padding: 15px 9px;
+    }
+}
+
+/* user table  */
+.kot-list-tab{
+    padding: 3px 15px;
+    padding-bottom: 0px;
+    margin: 0px 0px !important;
+    margin-bottom: 12px !important;
+    box-shadow: 0px 1px 3px rgba(85, 85, 85, 0.3);
+}
+@media (max-width: 768px) {
+    .kot-list-tab {
+        padding: 1px 9px;
+        margin: 0px 0px !important;
+        margin-bottom: 12px !important;
+    }
+}
+.kot-list-tab .nav {
+    overflow-x: auto;
+    white-space: nowrap;
+    flex-wrap: nowrap;
+    -webkit-overflow-scrolling: touch;
+}
+.nav-link {
+    border: none;
+    border-bottom: 2px solid transparent;
+    margin-right: 10px;
+    background-color: white;
+}
+
+.tab-btn{
+    color: grey !important;
+    font-size: 17px !important;
+    padding: 10px 5px !important;
+    font-weight: bold;
+    opacity: 0.85;
+}
+
+.tab-btn:hover{
+    color: black !important;
+    opacity: 0.75;
+}
+
+
+.nav-link.active {
+    border-bottom: 3px solid #0066A7;
+    color: #0066A7 !important;
+    font-weight: 600;
+    opacity: 1;
+}
+
+.nav-link:focus {
+    box-shadow: none;
+}
+/* ------------------------ KOT Grid ---------------------- */
+.inprogress-ready-btn
+{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 13px;
+    border-radius: 3px;
+    padding: 6px 9px;
+    font-weight: bolder;
+    cursor: pointer;
+    background-color: none;
+    color: #0066A7;
+    border: 1px solid #0066A7;
+}
+
+.active-btn
+{
+    background-color: #0066A7;
+    color: white;
+}
+
+.light-btn
+{
+    background-color: none;
+    color: #0066A7;
+    border: 1px solid #0066A7;
+}
+
+.next-back-btn
+{
+    width: 30px;
+}
+
+/* ------------------------ KOT Grid Card---------------------- */
+.KOT-Card-List-Container
+{
+    overflow: hidden;
+}
+
+.card-wrapper {
+    transition: transform 0.5s ease;
+}
+
+.main-container-KOT
+{
+    overflow-x: auto;
+}
+
+.KOT-Card
+{
+    width: 300px;
+    height: 330px;
+    border-radius: 5px;
+    border: 1px dashed #c5c5c5;
+    flex: 0 0 auto;
+    font-size: 15px;
+    flex-shrink: 0;
+}
+
+.Card-Header, .Card-Footer
+{
+    height: 60px;
+    padding: 3px 5px;
+    background-color: #F2F2F2;
+}
+
+.Card-Content
+{
+    overflow-y: auto;
+    flex-grow: 1;
+    padding: 5px 10px;   
+    color: black;
+    opacity: 0.80;
+}
+
+.hidden {
+    display: none !important;
+}
+
+    /* Hide number input spinners for Chrome, Safari, Edge, and Opera */
+    .quantity-input::-webkit-outer-spin-button,
+    .quantity-input::-webkit-inner-spin-button {
+        -webkit-appearance: none;
+        margin: 0;
+    }
+
+    .btn-check:focus+.btn, .btn:focus {
+        outline: 0; 
+        box-shadow: 0 0 0 .0 rgba(13, 110, 253, .25); 
+    }
+
+    /* Hide number input spinners for Firefox */
+    .quantity-input {
+        -moz-appearance: textfield;
+    }
+
+
+    .quantity-input
+    {
+        border: none; 
+        outline: none; 
+        width: 25px
+    }
+
+
+  
+/* ------------------- Pending Orders Modal CSS ------------------- */
+
+.pending-order-div {
+    overflow-x: auto;
+}
+
+.pending-order-card {
+    border: 2px solid #0066A7;
+    border-radius: 5px;
+    margin: 10px 0;
+    width: 160px !important;
+}
+
+.inprogress-ready-btn {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 13px;
+    border-radius: 3px;
+    padding: 6px 9px;
+    font-weight: bolder;
+    cursor: pointer;
+    color: #0066A7;
+    border: 1px solid #0066A7;
+    background-color: transparent;
+}
+
+.active-btn {
+    background-color: #0066A7;
+    color: white;
+}
+
+.form-check-input:checked {
+    background-color: #0066A7 !important;
+    border-color: #0066A7 !important;
+    box-shadow: none;
+}

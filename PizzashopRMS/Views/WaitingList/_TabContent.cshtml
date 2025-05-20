@@ -1,0 +1,70 @@
+<input type="text" id="currentTabId" value="@Model.CurrentId" hidden>
+
+<!-- Item Tab -->
+<div class="row border rounded waiting-list-tab bg-white mt-5">
+    <div class="d-flex nav" id="" role="tablist" >
+        @if (Model.SectionList != null)
+        {
+            @foreach (var tab in Model.SectionList)
+            {
+                <button class="nav-link tab-btn d-flex me-3 align-items-center @(tab.SectionId == Model.CurrentId ? "active" : "") "
+                        data-tab-id="@tab.SectionId" onclick="GetTabContent(@tab.SectionId)">
+                    <div>@tab.SectionName <span class="total-tokan ms-1">@tab.TotalToken</span></div>
+                </button>
+            }
+        }
+    </div>
+</div>
+
+
+<!-- Tab Content -->
+<div class="row waiting-list-tab bg-white rounded pt-2" style="z-index: 1000;">
+    <div class="tab-content" id="tabContent">
+        <div class="tab-pane fade show active" id="default-tab">
+
+            <div class="table-responsive">
+
+                <table class="table mb-0 waiting-token-font waiting-list-table">
+                    <thead class="">
+                        <tr>
+                            <td>#Token No</td>
+                            <td>Created At</td>
+                            <td>Waiting Time</td>
+                            <td>Name</td>
+                            <td>No.of Persons</td>
+                            <td>Phone Number</td>
+                            <td>Email</td>
+                            <td class="text-center">Action</td>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach(var token in Model.TokenList)
+                        {
+                            <tr>
+                                <td>#@token.TokenNo</td>
+                                <td>@token.CreatedDate</td>
+                                <td data-time="@token.CreatedDate.ToString("yyyy-MM-ddTHH:mm:ss")" class="created-date">
+                                    <span class="time-difference">
+                                        0 hrs 0 min loading...
+                                    </span>
+                                </td>
+                                <td>@token.CustomerName</td>
+                                <td>@token.NoOfPerson</td>
+                                <td>@token.PhoneNo</td>
+                                <td>@token.Email</td>
+                                <td class="action-icons text-center">
+                                    <i class="bi bi-pencil mx-1" onclick="GenerateTokenModal(@token.TokenId)"></i>
+                                    <i class="bi bi-trash mx-1" data-bs-toggle="modal" data-bs-target="#deleteTokenModal" onclick="deleteToken(@token.TokenId)"></i>
+                                    <i class="bi bi-person-check mx-1" data-bs-toggle="modal" data-bs-target="#assignTokenModal" onclick="assignToken(@token.TokenId, @Model.CurrentId, @token.NoOfPerson)"></i>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+

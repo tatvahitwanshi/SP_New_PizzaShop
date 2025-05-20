@@ -1,0 +1,46 @@
+@model List<DataAccessLayer.ViewModels.PendingOrders>
+
+<div class="fw-bold special-color fs-5" id="">
+    Pending Orders 
+</div>
+
+
+@if(Model.Any())
+{
+    <div class="d-flex gap-2  pending-order-div flex-nowrap">
+        @foreach(var order in Model)
+        {
+            <div class="d-flex align-items-center justify-content-between py-2 px-2 flex-nowrap pending-order-card">
+                <!-- Circular Checkbox -->
+                <div class="form-check">
+                    <input class="form-check-input rounded-circle" type="checkbox" value="@order.OrderID" name="selectedOrders" id="orderCheck_@order.OrderID">
+                </div>
+
+                <!-- Order Details -->
+                <div class="flex-grow-1 ms-2">
+                    <div class="fw-semibold d-flex justify-content-between" style="text-wrap: nowrap;">
+                        <span class="special-color fw-bold" style="text-wrap: nowrap;">#@order.OrderID</span> 
+                        <span class="small">₹ @order.Amount</span> 
+                    </div>
+                    <div class="small text-muted">
+                        <span data-time="@order.OrderTime.ToString("yyyy-MM-ddTHH:mm:ss")" class="pending-order-time" style="text-wrap: nowrap;">
+                            <span class="time-difference"></span>
+                        </span>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+
+    <div class="active-btn inprogress-ready-btn" style="width : 150px; margin-bottom: 10px;" onclick="sendToInProgress()">
+        Move to In Progress
+    </div>
+}else
+{
+    <div class="text-start mt-3">
+        <i class="bi bi-hourglass-split"></i>
+        <span class="ms-3">No order is Pending ......</span>
+    </div>
+}
+
+

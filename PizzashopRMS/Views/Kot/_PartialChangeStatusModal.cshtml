@@ -1,0 +1,106 @@
+@model DataAccessLayer.ViewModels.OrderCards
+<div class="modal fade" id="ChangeStatusModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
+    aria-labelledby="staticBackdrop1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h1 class="modal-title fs-5">Order ID : #@Model.OrderId</h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="updateItemQuantityForm">
+                    <input type="hidden" asp-for="@Model.OrderId">
+                    <input type="hidden" name="orderStatus" value="@ViewBag.OrderStatus">
+                    <input type="hidden" name="currentCategory" value="@ViewBag.CurrentCategory">
+                    <table class="table">
+                        <thead>
+                            <tr class="opacity-75">
+                                <th class="text-start">Item</th>
+                                <th class="text-end">Quantity</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @* <tr>
+                    <td class="text-start">
+                        <input type="checkbox" class="me-1 form-check-input">
+                        Pizza
+                        <ul>
+                            <li>Name</li>
+                        </ul>
+                    </td>
+                    <td class="text-end ">
+                        <div class="text-end ms-auto align-middle align-self-center"
+                            style="width: fit-content; border: 1px solid #0066A7;">
+                            <button type="button" class="btn btn-sm">-</button>
+                            <input class="m-0 p-0 text-center quantity-input" type="number" value="10"
+                                style="border: 0px; width:25px; outline: none;">
+                            <button type="button" class="btn btn-sm">+</button>
+                        </div>
+                    </td>
+                </tr> *@
+                            @if (Model.ItemList != null)
+                            {
+                                @for (int i = 0; i < Model.ItemList.Count; i++)
+                                {
+                                    <tr>
+                                        <td class="text-start">
+                                            <input type="checkbox" class="me-1 form-check-input"
+                                                asp-for="@Model.ItemList[i].IsSelected"> <span
+                                                class="fw-bold fs-6">@Model.ItemList[i].ItemName</span>
+                                            <input type="hidden" asp-for="@Model.ItemList[i].DishId" />
+                                            <ul>
+                                                @if (Model.ItemList[i].ModifiersList != null)
+                                                {
+                                                    @foreach (var m in Model.ItemList[i].ModifiersList)
+                                                    {
+                                                        <li>@m.ModifierName</li>
+                                                    }
+                                                }
+                                            </ul>
+                                        </td>
+                                        <td class="text-end ">
+                                            <div class="text-end ms-auto align-middle align-self-center"
+                                                style="width: fit-content; border: 1px solid #0066A7;">
+                                                <button type="button" class="btn btn-sm"
+                                                    onclick="ChangeQuantity(@Model.ItemList[i].DishId, 'decrement')">-</button>
+                                                <input class="m-0 p-0 text-center quantity-input" type="number"
+                                                    asp-for="@Model.ItemList[i].Quantity" value=0
+                                                    max=@Model.ItemList[i].Quantity readonly
+                                                    style="border: 0px; width:25px; outline: none;"
+                                                    id="quantity-input-@Model.ItemList[i].DishId">
+                                                <button type="button" class="btn btn-sm"
+                                                    onclick="ChangeQuantity(@Model.ItemList[i].DishId, 'increment')">+</button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                }
+                            }
+                        </tbody>
+                    </table>
+                    @if(ViewBag.OrderStatus == "In Progress" && ViewBag.isServed)
+                    {
+                        <div class="d-flex justify-content-between">
+                            <button type="button" class="inprogress-ready-btn served-btn" onclick="markServedOrder(@Model.OrderId)">Served</button>
+                            <div class="d-flex justify-content-end gap-2">
+                                <button type="submit" class="inprogress-ready-btn active-btn">Marked as @ViewBag.OrderStatus
+                                </button>
+                                <button type="button" class="inprogress-ready-btn bg-white" data-bs-dismiss="modal"> Cancel
+                                </button>
+                            </div>
+                        </div>
+                    }
+                    else
+                    {
+                         <div class="d-flex justify-content-end gap-2">
+                                <button type="submit" class="inprogress-ready-btn active-btn">Marked as @ViewBag.OrderStatus
+                                </button>
+                                <button type="button" class="inprogress-ready-btn bg-white" data-bs-dismiss="modal"> Cancel
+                                </button>
+                        </div>
+                    }
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+

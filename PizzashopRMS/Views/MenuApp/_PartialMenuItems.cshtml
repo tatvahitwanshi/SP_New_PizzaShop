@@ -1,0 +1,38 @@
+
+<input type="text" value="@Model.CurrCategoryID" id="current-category-id" hidden>
+
+<div class="item-list-container d-flex mt-2 gap-3 flex-wrap ">
+@* onclick="showModifierListModal(@item.ItemId, '@item.isModifier') *@
+    @foreach (var item in Model.ItemList)
+    {
+        <div class="item-card mb-2 d-flex @(item.ItemType == "veg" ? "color-veg" : "color-non-veg")"
+            onclick="showModifierListModal(@item.ItemId) ">
+
+            <div class="item-image-container">
+                @if (item.ImageUrl == null || item.ImageUrl == "")
+                {
+                    <img src="~/images/dining-menu.png" alt="" class="item-image">
+
+                }
+                else
+                {
+                    <img src="@item.ImageUrl" alt="" class="item-image">
+                }
+            </div>
+
+            <div class="d-flex flex-column flex-grow-1 justify-content-between item-values">
+                <span class="fw-bold"> @item.ItemName </span>
+                <div class="d-flex align-items-center justify-content-between">
+                    <span>₹@item.Rate</span>
+                    <i class="bi @(item.isFavourite == true ? "bi-heart-fill" : "bi-heart") fw-bold special-color"
+                        onclick="event.stopPropagation(); markFavourite(this, @item.ItemId)">
+                    </i>
+                </div>
+
+            </div>
+
+        </div>
+
+    }
+
+</div>

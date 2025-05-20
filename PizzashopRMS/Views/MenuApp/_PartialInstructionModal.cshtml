@@ -1,0 +1,30 @@
+<div class="modal fade" id="instructionModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content p-3 pt-3 rounded-4 shadow">
+
+            <!-- Modal Header -->
+            <div class="d-flex justify-content-between align-items-center mb-3 border-bottom pb-2">
+                <h4 class="fw-bold text-secondary fs-5" id="instructionModalName">Assign Table</h4>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+
+
+            <!-- Modal Body Text -->
+            <textarea rows="3" style="width: 100%; border-color: rgba(128, 128, 128, 0.589);" id="InstructionsInput" class="mb-3 p-2 border-secondary rounded" placeholder="Comments*">
+            </textarea>
+
+            <input type="hidden" id="itemIdForInstruction">
+
+
+            <!-- Action Buttons -->
+            <div class="d-flex justify-content-end gap-2">
+                <div type="button" class="btn text-white" style="background-color: #0066A7;" data-bs-dismiss="modal" id="saveInstructionBtn" onclick="saveInstructionForItem()">
+                    Save
+                </div>
+                <div type="button" class="btn" style="border-color: #0066A7; color: #0066A7; text-decoration: none;" class=" fw-semibold" data-bs-dismiss="modal">
+                    Cancel
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

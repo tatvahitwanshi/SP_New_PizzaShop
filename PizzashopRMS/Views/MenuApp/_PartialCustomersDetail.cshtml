@@ -1,0 +1,62 @@
+@model DataAccessLayer.ViewModels.CustomerDetailsOrderApp
+
+<div class="modal fade" id="customerDetailsModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content token-generate-modal">
+
+            <form asp-action="SaveCustomerDetails" method="post" class="modal-body" id="customerDetailsForm">
+                <input type="hidden" asp-for="TokenOrOrder" />
+                <input type="hidden" asp-for="Id" />
+
+
+                <div class="d-flex justify-content-between">
+                    <div class="fw-bold fs-5 text-secondary">Customer Details</div>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>   
+                </div>
+
+                <div class="row pe-2 mt-2">
+                    <div class="col-12">
+                        <div class="row">
+                            <div class="col-12 form-floating mt-3">
+                                <input asp-for="CustomerName" class="form-control" placeholder="Name" id="customerName" />
+                                <label asp-for="CustomerName">Name*</label>
+                                <span asp-validation-for="CustomerName" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-6 form-floating mt-3">
+                                <input asp-for="MobileNo" class="form-control" placeholder="Phone" id="customerPhone"/>
+                                <label asp-for="MobileNo">Mobile No.*</label>
+                                <span asp-validation-for="MobileNo" class="text-danger"></span>
+                            </div>
+                            <div class="col-6 form-floating mt-3">
+                                <input asp-for="NumberOfPersons" class="form-control" placeholder="No. of Persons" id="customerCount" oninput="checkCapacityTableInput(this.value)"/>
+                                <label asp-for="NumberOfPersons">No. of Persons*</label>
+                                <span asp-validation-for="NumberOfPersons" class="text-danger" id="maxCapacityTableErrorAsp"></span>
+                                <span id="maxCapacityTableError" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-12 form-floating mt-3">
+                                <input asp-for="CustomerEmail" class="form-control" placeholder="Email" id="customerAddress" tabindex="-1" style="background-color: lightgray; pointer-events: none; "/>
+                                <label asp-for="CustomerEmail">Email*</label>
+                                <span asp-validation-for="CustomerEmail" class="text-danger"></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="d-flex justify-content-end mt-3 gap-2">
+                    <button type="submit" class="dark-btn light-btn">Save</button>
+                    <button type="button" class="light-btn" data-bs-dismiss="modal">Cancel</button>
+                </div>
+            </form>
+
+        </div>
+    </div>
+</div>
+
+
+<script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.min.js"></script>

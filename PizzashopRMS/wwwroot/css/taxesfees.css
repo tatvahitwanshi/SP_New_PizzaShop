@@ -1,0 +1,6 @@
+#addTaxForm .form-floating>label,#editTaxForm .form-floating>label {
+    position: absolute;
+    top: 0;
+    left: 10px !important;
+    opacity: 0.65;
+}

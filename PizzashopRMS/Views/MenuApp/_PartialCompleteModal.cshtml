@@ -1,0 +1,65 @@
+@model DataAccessLayer.ViewModels.CompleteOrderApp
+<!-- Complete Order Modal -->
+<div class="modal fade" id="CompleteOrderAppModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+
+            <form class="modal-body" id="completeOrderAppForm">
+                
+
+                <div id="confirmModalCompletedOrderApp">
+                    <div class="d-flex justify-content-between mb-3">
+                        <h1 class="modal-title fs-5 fw-semibold special-color" id="exampleModalLabel">Complete Confirmation</h1>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+
+                    <input type="text" id="completeOrderId" asp-for="OrderId" hidden>
+
+                    <div class="d-flex align-items-center flex-column gap-2 justify-content-center mb-3">
+                        <img src="~/images/toppng.com-warning-icon-2400x2400.png" alt="" style="height: 35px; width: 35px;">
+                        <div class="f-5">Are You Sure you want to Complete Order ?</div>
+                    </div>
+
+                    <div class="d-flex justify-content-center gap-2">
+                        <button type="button" class="light-btn dark-btn" style="width: 60px;" onclick="toggleReviewModal(@Model.OrderId)">Yes</button>
+                        <button type="button" class="light-btn" data-bs-dismiss="modal" style="width: 55px;">No</button>
+                    </div>
+                </div>
+
+                <div class="d-none" id="confirmModalReview">
+                    <div class="d-flex justify-content-between mb-3">
+                        <h1 class="modal-title fs-5 fw-semibold special-color" id="exampleModalLabel">Customer Review</h1>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+
+                    <div>
+                        @foreach (var rating in new[] { "Food", "Service", "Ambience" })
+                        {
+                            var finalrating = rating.ToLower();
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <span class="fw-bold opacity-75">@rating</span>
+                                <input type="text" hidden  id="@finalrating" value="0" name="@rating"/>
+                                <div class="star-rating" data-rating="@finalrating">
+                                    @for (int i = 1; i <= 5; i++)
+                                    {
+                                        <i class="bi bi-star ms-1 star" data-value="@i"></i>
+                                    }
+                                </div>
+                            </div>
+                        }
+                    </div>
+
+                    <hr style="border: 1px solid #0066A7">
+
+                    <textarea rows="3" style="width: 100%; border-color: none;" class="mb-3 p-2 border-secondary rounded" placeholder="Comment" asp-for="Comments"></textarea>
+
+                    <div class="d-flex justify-content-center gap-2">
+                        <button type="submit" class="light-btn dark-btn" style="width: 60px;">Save</button>
+                        <button type="button" class="light-btn" data-bs-dismiss="modal" style="width: 75px;">Cancel</button>
+                    </div>
+                </div>
+
+            </form>
+        </div>
+    </div>
+</div>

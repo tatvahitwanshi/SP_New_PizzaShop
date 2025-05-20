@@ -1,0 +1,114 @@
+@model DataAccessLayer.ViewModels.OrdersViewModel
+@{
+    Layout = "~/Views/Shared/_LayoutCustom.cshtml";
+    ViewData["Title"] = " Orders Page";
+    ViewBag.Active = "Orders";
+}
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Bootstrap Font Icon CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.5.0/font/bootstrap-icons.css" />
+    <link rel="stylesheet" href="~/css/Orders.css">
+    <title>Orders Page</title>
+
+</head>
+
+<body>
+    <div class="container-fluid p-4">
+        <!-- Title and Filter Row -->
+        <div class="row my-3">
+            <div class="col-12 col-md-2">
+                <div class="fs-2 fw-bold special-color">Orders</div>
+            </div>
+            <div class="col-12 col-md-10">
+                <div class="row overflow-hidden d-flex justify-content-end align-items-center">
+
+                    <!-- Search Input -->
+                    <div class="col-md-3 col-12 mb-3 mb-md-0">
+                        <div class="form-floating">
+                            <input type="text" placeholder="Search" id="searchOrderInput" class="form-control"
+                                asp-for="@Model.OrderPage.Searchkey" oninput="onKeySearch()">
+                            <label for="searchOrderInput">Search</label>
+                        </div>
+                    </div>
+
+                    <!-- Order Status Dropdown -->
+                    <div class="col-md-3 col-sm-6 col-12 mb-3 mb-md-0">
+                        <div class="form-floating">
+                            <select class="form-select" id="searchOrderSelect" onchange="StatusOnChange()">
+                                <option selected value="0" class="select-all">All Status</option>
+                                @foreach (var status in Model.OrderStatus)
+                                {
+                                    <option value="@status.Orderstatusid">@status.Statusname</option>
+                                }
+                            </select>
+                            <label for="searchOrderSelect">Order Status</label>
+                        </div>
+                    </div>
+
+                    <!-- Time Filter Dropdown -->
+                    <div class="col-md-3 col-sm-6 col-12 mb-3 mb-md-0">
+                        <div class="form-floating">
+                            <select class="form-select" id="searchTimeFilter" asp-for="@Model.OrderPage.lastDays"
+                                onchange="TimeOnChange()">
+                                <option value="All Time" selected>All Time</option>
+                                <option value="Last 7 Days">Last 7 Days</option>
+                                <option value="Last 30 Days">Last 30 Days</option>
+                                <option value="This Month">This Month</option>
+                                <option value="This Year">This Year</option>
+                            </select>
+                            <label for="searchTimeFilter">Time Filter</label>
+                        </div>
+                    </div>
+
+                    <!-- Export Button -->
+                    <div class="col-auto my-auto d-flex justify-content-end">
+                        <a class="btn btn-primary d-flex align-items-center justify-content-center px-3 fs-6"
+                            id="export-btn" onclick="exportToExcelFile()">
+                            <img src="/images/export-icon.png" alt="" style="filter: invert(1); height: 17px;">
+                            <span class="d-none d-sm-flex ms-2 fw-bold">Export</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Date Filter and Buttons -->
+        <div class="row d-flex justify-content-end align-items-center">
+            <div class="col-md-3 col-sm-6 col-12 mb-3 mb-md-0">
+                <div class="form-floating">
+                    <input type="date" class="form-control" id="orderFromDate" asp-for="@Model.OrderPage.startDate">
+                    <label for="orderFromDate">From Date</label>
+                </div>
+            </div>
+            <div class="col-md-3 col-sm-6 col-12 mb-3 mb-md-0">
+                <div class="form-floating">
+                    <input type="date" class="form-control" id="orderToDate" asp-for="@Model.OrderPage.endDate">
+                    <label for="orderToDate">To Date</label>
+                </div>
+            </div>
+            <div class="col-md-auto d-flex justify-content-md-end justify-content-end gap-2">
+                <a class="btn btn-primary" id="search-btn" onclick="ApplyFilters()">Search</a>
+                <a class="btn btn-outline-secondary" id="clear-btn" onclick="ClearFilters()">Clear</a>
+            </div>
+        </div>
+
+        <div class="row  p-2 mt-4" id="orderTablePartialView">
+            <partial name="_PartialOrderList.cshtml"></partial>
+        </div>
+    </div>
+</body>
+
+</html>
+
+@section scripts {
+    <script src="~/js/orders.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js" integrity="sha512-VEd+nq25CkR676O+pLBnDW09R7VQX9Mdiij052gVCp5yVH3jGtH70Ho/UUv4mJDsEdTvqRCFZg0NKGiojGnUCw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+}

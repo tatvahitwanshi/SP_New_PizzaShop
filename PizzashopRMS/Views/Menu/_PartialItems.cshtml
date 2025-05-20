@@ -1,0 +1,929 @@
+@model DataAccessLayer.ViewModels.MenuViewModel
+
+<div class="row mt-3">
+    <div class="col">
+        @if(Model.Items.List != null && Model.Items.List.Any())
+        {
+            <div class="table-responsive">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th scope="col"><input class="form-check-input main-check" type="checkbox" value=""
+                                    id="selectAllCheckbox"></th>
+                            <th scope="col">Name</th>
+                            <th scope="col">Item Type</th>
+                            <th scope="col">Rate </th>
+                            <th scope="col">Quantity</th>
+                            <th scope="col">Available</th>
+                            @if(ViewBag.Permissions[PermissionConst.CanAddEdit] || ViewBag.Permissions[PermissionConst.CanDelete])
+                            {
+                                <th scope="col">Action</th>
+                            }
+                        </tr>
+                    </thead>
+                    <tbody id="itemsTableBody">
+                        @foreach (var item in Model.Items.List)
+                        {
+                            <tr>
+                                <td>
+                                    <input class="form-check-input inner-check" type="checkbox" data-id="@item.ItemId">
+                                </td>
+                                <td>
+                                    @if (item.Itemimage != null)
+                                    {
+                                        <img src="@Url.Content(item.Itemimage)" alt="" width="30px">
+
+                                    }
+                                    else
+                                    {
+                                        <img src="~/images/dining-menu.png" alt="" width="30px">
+
+                                    }
+                                    @* src="@item.Itemimage" *@
+                                    @item.Itemname
+                                </td>
+                                <td>
+                                    <img src="~/images/icons/@(item.Itemtype == "veg" ? "veg-icon.svg" : "non-veg-icon.svg")"
+                                        width="20px" alt="">
+                                </td>
+                                <td>@item.Rate</td>
+                                <td>@item.Quantity</td>
+                                <td>
+                                    <div class="form-check form-switch">
+                                        <input class="form-check-input" style="width: 2.5rem; height: 25px;" type="checkbox"
+                                            role="switch" @(item.Isavailable ?? false ? "checked" : "") disabled>
+                                    </div>
+                                </td>
+                                @if(ViewBag.Permissions[PermissionConst.CanAddEdit] || ViewBag.Permissions[PermissionConst.CanDelete])
+                                {
+                                    <td>
+                                        <div class="d-flex">
+                                            @if (ViewBag.Permissions[PermissionConst.CanAddEdit])
+                                            {
+                                                <a href="#" style="text-decoration: none; color: grey;" 
+                                                    onclick="GetItemDetails(@item.ItemId)">
+                                                    <i class="bi bi-pen"></i>
+                                                </a>
+                                            }
+                                            @* else
+                                            {
+                                                <img src="~/images/pen-slash.svg" alt="" class="img-fluid" style="width: 16px; height: 16px;">
+                                            } *@
+                                            @if (ViewBag.Permissions[PermissionConst.CanDelete])
+                                            {
+                                                <a href="#" class="ms-4" style="text-decoration: none; color: grey;"
+                                                    onclick="openItemDeleteModal(@item.ItemId)"><i class="bi bi-trash"></i></a>
+                                            }
+                                            @* else
+                                            {
+                                                <img src="~/images/trash-slash.svg" alt="" class="img-fluid" style="width: 16px; height: 16px;">
+                                            } *@
+                                        </div>
+                                    </td>
+                                }
+                            </tr>
+                        }
+                    </tbody>
+
+                </table>
+            </div>
+            <div class="main-pagination ">
+                <div class="item-show ">
+                    <nav aria-label="Page navigation example">
+                        <div class="pagination ">
+                            <span class="align-self-center">Items Per Page
+                                :</span>
+                            <select class="form-select form-select-sm ms-2 align-self-center"
+                                aria-label="Small select example" style=" width: unset; " id="pageSizeDropdownItem"
+                                onchange="updatePageSize()">
+                                @if (Model.Items.PageSize != null)
+                                {
+                                    @* <option value="1" selected="@(Model.Items.PageSize == 1 ? true : false)">1</option>
+                                    <option value="3" selected="@(Model.Items.PageSize == 3 ? true : false)">3</option> *@
+                                    <option value="5" selected="@(Model.Items.PageSize == 5 ? true : false)">5</option>
+                                    <option value="10" selected="@(Model.Items.PageSize == 10 ? true : false)">10</option>
+                                    <option value="25" selected="@(Model.Items.PageSize == 25 ? true : false)">25</option>
+                                }
+                            </select>
+
+                        </div>
+                    </nav>
+                </div>
+                <div class="showing-page">
+                    <nav aria-label="Page navigation example">
+                        <div class="pagination ">
+                            <span class=" ms-2  align-self-center">Showing
+                                @{
+                                    var startRecord = (Model.Items.PageNumber - 1) * Model.Items.PageSize + 1;
+                                    var endRecord = Model.Items.PageNumber * Model.Items.PageSize;
+                                    if (endRecord > Model.Items.Count)
+                                        endRecord = Model.Items.Count;
+
+                                    if (Model.Items.Count == 0)
+                                    {
+                                        startRecord = 0;
+                                        endRecord = 0;
+                                    }
+                                }
+                                <span style="color: green;" class="me-1">@startRecord - @endRecord</span> of <span
+                                    style="color: red;" class="ms-1">@Model.Items.Count</span>
+                            </span>
+                            <button class="btn border ms-2  align-self-center @(Model.Items.PageNumber == 1 ? "disabled" : "")" type="submit"
+                                onclick="PanginationBtn('back')"><i class="bi bi-chevron-left "></i>
+                            </button>
+                            <button class="btn border ms-2  align-self-center @((Model.Items.PageNumber * Model.Items.PageSize >= Model.Items.Count) ? "disabled" : "")" type="submit"
+                                onclick="PanginationBtn('next')"><i class="bi bi-chevron-right"></i>
+                            </button>
+                        </div>
+                    </nav>
+                </div>
+
+            </div> 
+        }
+        else
+        {
+            <span style="color: #0066A7; font-weight: 600; display:flex; justify-content: center;">No Item Found</span>
+        }
+    </div>
+</div>
+
+
+
+@* Add Item Modal *@
+<div class="modal fade" id="additemModal" tabindex="-1" data-bs-backdrop="static" data-bs-keyboard="false"
+    aria-labelledby="staticBackdropLabel" aria-hidden=" true">
+    <div class="modal-dialog modal-dialog-centered w-75 custom-addedit-modal">
+        <div class="modal-content">
+            <form class="modal-body additemform" id="additemform" enctype="multipart/form-data">
+                <div class="d-flex justify-content-between">
+                    <div class="special-color fw-bold fs-4">Add Item</div>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <input type="hidden" value="@Model.Items.ParentId" id="parentId" name="ParentId" >
+
+                <div class="row pe-2 mt-2">
+                    <div class="col-md-8 col-12">
+                        <div class="row">
+                            <div class="col-md-6 col-12 form-floating mt-3" >
+                                <select class="form-select" id="categoryDropdown" asp-for="@Model.AddEditItem.CategoryId" style="pointer-events: none; background-color: #f8f9fa;">
+                                    @foreach (var category in Model.Categories)
+                                    {
+                                        <option value="@category.CategoryId">@category.Categoryname</option>
+                                    }
+                                </select>
+                                <label for="categoryDropdown">Food Category</label>
+                            </div>
+
+                            <div class="col-md-6 col-12 form-floating mt-3">
+                                <input type="text" class="form-control" id="name" placeholder="Name" asp-for="@Model.AddEditItem.Itemname">
+                                <label for="name">Name*</label>
+                                <span class="text-danger" asp-validation-for="AddEditItem.Itemname"></span>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-xl-6 col-12">
+                                <div class="row">
+                                    <div class="col-md-6 col-12 form-floating mt-3">
+                                        <select class="form-select" id="itemTypeDropdown" asp-for="@Model.AddEditItem.Itemtype" >
+                                            <option value="veg" selected>Veg</option>
+                                            <option value="non-veg">Non-veg</option>
+                                        </select>
+                                        <label for="itemTypeDropdown">Item Type</label>
+                                    </div>
+                                    <div class="col-md-6 col-12 form-floating mt-3">
+                                        <input type="number" class="form-control" id="name" placeholder="Name" min="0"
+                                            step="1" asp-for="@Model.AddEditItem.Rate" >
+                                        <label for="name">Rate*</label>
+                                         <span class="text-danger" asp-validation-for="AddEditItem.Rate"></span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-xl-6 col-12">
+                                <div class="row">
+                                    <div class="col-md-6 col-12 form-floating mt-3">
+                                        <input type="number" class="form-control" id="quantity" placeholder="Name"
+                                            min="0" step="1" asp-for="@Model.AddEditItem.Quantity" >
+                                        <label for="quantity">Quantity*</label>
+                                        <span class="text-danger" asp-validation-for="AddEditItem.Quantity"></span>
+                                    </div>
+                                    <div class="col-md-6 col-12 form-floating mt-3">
+                                        <select class="form-select" id="unitDropdown" asp-for="@Model.AddEditItem.UnitId" >
+                                            @foreach (var itemsUnit in Model.ItemsUnit)
+                                            {
+                                                <option value="@itemsUnit.Unitid">@itemsUnit.Unitname</option>
+                                            }
+                                        </select>
+                                        <label for="unitDropdown">Unit</label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-xl-6 col-12 mt-3">
+                                <div class="row">
+                                    <div
+                                        class="col-6 form-check form-switch d-flex justify-content-center align-items-center">
+                                        <input class="form-check-input" type="checkbox" id="availableToggle"
+                                            style="height: 30px; width: 3.5rem;" asp-for="@Model.AddEditItem.Isavailable">
+                                        <label class="form-check-label ms-2" for="availableToggle">Available</label>
+                                        <input type="hidden" name="Isavailable" value="false">
+                                    </div>
+                                    <div
+                                        class="col-6 form-check form-switch d-flex justify-content-center align-items-center">
+                                        <input class="form-check-input" type="checkbox" id="defaultTaxToggle"
+                                            style="height: 30px; width: 3.5rem;" asp-for="@Model.AddEditItem.Defaulttax">
+                                        <label class="form-check-label ms-2" for="defaultTaxToggle">Default Tax</label>
+                                        <input type="hidden" name="Defaulttax" value="false">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-xl-6 col-12">
+                                <div class="row">
+                                    <div class="col-md-6 col-12 form-floating mt-3">
+                                        <input type="number" class="form-control" id="taxpercentage" placeholder="Name"
+                                            min="0" step="0.01" asp-for="@Model.AddEditItem.Taxpercentage">
+                                        <label for="taxpercentage">Tax Percentage</label>
+                                        <span class="text-danger" asp-validation-for="AddEditItem.Taxpercentage"></span>
+                                    </div>
+                                    <div class="col-md-6 col-12 form-floating mt-3">
+                                        <input type="text" class="form-control" id="shortcode" placeholder="Name"
+                                            asp-for="@Model.AddEditItem.Shortcode">
+                                        <label for="shortcode">Short Code</label>
+                                        <span class="text-danger" asp-validation-for="AddEditItem.Shortcode"></span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row mt-3">
+                            <div class="form-floating">
+                                <textarea class="form-control" id="description" placeholder="Enter description" rows="5"
+                                    style="height: 100px;" asp-for="@Model.AddEditItem.Itemdescription" ></textarea>
+                                <label for="description">Description</label>
+                                <span class="text-danger" asp-validation-for="AddEditItem.Itemdescription"></span>
+                            </div>
+                        </div>
+
+
+                        <div class="mt-3 fs-6" style="opacity: 0.75;">Upload Image</div>
+                        <div class="row mt-0">
+                            <div style="position: relative;" id="fileLabel">
+                                <input type="file" class="form-control" id="itemImage" placeholder=""
+                                    style="height: 90px; position: absolute; opacity: 0;" asp-for="@Model.AddEditItem.Itemimage" onchange="updateFileNameAndValidFile('itemImage','imageName','imageValidation')">
+                                <div id="file-box"
+                                    style="height: 90px; border: 1px dashed rgb(173, 170, 170); border-radius: 5px;"
+                                    class="d-flex justify-content-center align-items-center">
+                                    <i class="bi bi-cloud-arrow-up h4 mt-3 me-2"></i> <span id="imageName">Drag and Drop or Browse files</span>
+                                </div>
+                            </div>
+                        </div>
+                        <span class="text-danger" id="imageValidation"></span>
+
+                    </div>
+                    <input type="hidden" id="modGroupDataInput" asp-for="@Model.AddEditItem.AddModGroupWithItems" />
+                    <div class="col-md-4 mt-3 col-12 px-2  overflow-auto"
+                        style="background-color: #fff5d7; border-radius: 5px; height: 500px;">
+                        <div class="dropdown mt-2">
+                            <button class="btn btn-light dropdown-toggle w-100" type="button" id="modifierGroupDropdown"
+                                data-bs-toggle="dropdown" aria-expanded="false">
+                                Select Modifier Group
+                            </button>
+                            <ul class="dropdown-menu w-100" aria-labelledby="modifierGroupDropdown" id="modgroupAll">
+                                @foreach (var modgroup in Model.ModifierGroupModel)
+                                {
+                                    <li>
+                                        <label class="dropdown-item">
+                                            <input type="checkbox" value="@modgroup.ModifierGroupId" class="me-2"
+                                                name="modgroupCheckbox"> @modgroup.ModifierGroupName
+                                        </label>
+                                    </li>
+                                }
+
+                            </ul>
+                        </div>
+                        <div class="" id="modifierGroupDetail">
+
+                        </div>
+                    </div>
+                    @* <div class="" onclick="GetModGroupData()">
+                        click here
+                    </div> *@
+                </div>
+                <div class="d-flex justify-content-end mt-3">
+                    <button type="submit" id="savebtn" class="btn text-white" style="background-color: #0066A7;"
+                        type="submit">Save</button>
+                    <button type="button" class="btn ms-2"
+                        style="border-color: #0066A7; color: #0066A7; text-decoration: none;"
+                        data-bs-dismiss="modal">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@* Edit Item Model *@
+<div class="modal fade" id="edititemModal" tabindex="-1" data-bs-backdrop="static" data-bs-keyboard="false"
+    aria-labelledby="staticBackdropLabel aria-hidden=" true">
+    <div class="modal-dialog modal-dialog-centered w-75 custom-addedit-modal" >
+        <div class="modal-content">
+            <form class="modal-body edititemform" id="edititemform" enctype="multipart/form-data">
+                <input type="hidden" id="editItemId" asp-for="@Model.AddEditItem.ItemId">
+                <div class="d-flex justify-content-between">
+                    <div class="special-color fw-bold fs-4">Edit Item</div>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+
+                <div class="row pe-2 mt-2">
+                    <div class="col-md-8 col-12">
+                        <div class="row">
+                            <div class="col-md-6 col-12 form-floating mt-3">
+                                <select class="form-select" id="editcategoryDropdown" asp-for="@Model.AddEditItem.CategoryId">
+                                    @foreach (var category in Model.Categories)
+                                    {
+                                        <option value="@category.CategoryId">@category.Categoryname</option>
+                                    }
+                                </select>
+                                <label for="editcategoryDropdown">Food Category</label>
+                            </div>
+
+                            <div class="col-md-6 col-12 form-floating mt-3">
+                                <input type="text" class="form-control" id="editname" placeholder="Name" asp-for="@Model.AddEditItem.Itemname">
+                                <label for="editname">Name*</label>
+                                <span class="text-danger" asp-validation-for="AddEditItem.Itemname"></span>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-xl-6 col-12">
+                                <div class="row">
+                                    <div class="col-md-6 col-12 form-floating mt-3">
+                                        <select class="form-select" id="edititemTypeDropdown" asp-for="@Model.AddEditItem.Itemtype">
+                                            <option value="veg" selected>Veg</option>
+                                            <option value="non-veg">Non-veg</option>
+
+                                        </select>
+                                        <label for="edititemTypeDropdown">Item Type</label>
+                                    </div>
+                                    <div class="col-md-6 col-12 form-floating mt-3">
+                                        <input type="number" class="form-control" id="editrate" placeholder="Name"
+                                            min="0" step="1" asp-for="@Model.AddEditItem.Rate">
+                                        <label for="editrate">Rate*</label>
+                                        <span class="text-danger" asp-validation-for="AddEditItem.Rate"></span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-xl-6 col-12">
+                                <div class="row">
+                                    <div class="col-md-6 col-12 form-floating mt-3">
+                                        <input type="number" class="form-control" id="editquantity" placeholder="Name"
+                                            min="0" step="1" asp-for="@Model.AddEditItem.Quantity">
+                                        <label for="editquantity">Quantity*</label>
+                                        <span class="text-danger" asp-validation-for="AddEditItem.Quantity"></span>
+                                    </div>
+                                    <div class="col-md-6 col-12 form-floating mt-3">
+                                        <select class="form-select" id="editunitDropdown" asp-for="@Model.AddEditItem.UnitId">
+                                            @foreach (var itemsUnit in Model.ItemsUnit)
+                                            {
+                                                <option value="@itemsUnit.Unitid">@itemsUnit.Unitname</option>
+                                            }
+                                        </select>
+                                        <label for="editunitDropdown">Unit</label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-xl-6 col-12 mt-3">
+                                <div class="row">
+
+                                    <div
+                                        class="col-6 form-check form-switch d-flex justify-content-center align-items-center">
+                                        <input class="form-check-input" type="checkbox" id="editavailableToggle"
+                                            style="height: 30px; width: 3.5rem;"  asp-for="@Model.AddEditItem.Isavailable">
+                                        <label class="form-check-label ms-2" for="editavailableToggle">Available</label>
+                                        <input type="hidden" name="Isavailable" value="false">
+                                    </div>
+                                    <div
+                                        class="col-6 form-check form-switch d-flex justify-content-center align-items-center">
+                                        <input class="form-check-input" type="checkbox" id="editdefaultTaxToggle"
+                                            style="height: 30px; width: 3.5rem;"  asp-for="@Model.AddEditItem.Defaulttax">
+                                        <label class="form-check-label ms-2" for="editdefaultTaxToggle">Default
+                                            Tax</label>
+                                        <input type="hidden" name="Defaulttax" value="false">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-xl-6 col-12">
+                                <div class="row">
+                                    <div class="col-md-6 col-12 form-floating mt-3">
+                                        <input type="number" class="form-control" id="edittaxpercentage"
+                                            placeholder="Name" min="0" step="0.01" asp-for="@Model.AddEditItem.Taxpercentage">
+                                        <label for="edittaxpercentage">Tax Percentage</label>
+                                        <span class="text-danger" asp-validation-for="AddEditItem.Taxpercentage"></span>
+                                    </div>
+                                    <div class="col-md-6 col-12 form-floating mt-3">
+                                        <input type="text" class="form-control" id="editshortcode" placeholder="Name"
+                                           asp-for="@Model.AddEditItem.Shortcode">
+                                        <label for="editshortcode">Short Code</label>
+                                        <span class="text-danger" asp-validation-for="AddEditItem.Shortcode"></span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row mt-3">
+                            <div class="form-floating">
+                                <textarea class="form-control" id="editdescription" placeholder="Enter description"
+                                    rows="5" style="height: 100px;" asp-for="@Model.AddEditItem.Itemdescription"></textarea>
+                                <label for="editdescription">Description</label>
+                                <span class="text-danger" asp-validation-for="AddEditItem.Itemdescription"></span>
+                            </div>
+                        </div>
+
+
+                        <div class="mt-3 fs-6" style="opacity: 0.75;">Upload Image</div>
+                        <div class="row mt-0">
+                            <div style="position: relative;" id="fileLabel">
+                                <input type="file" class="form-control" id="edititemImage" placeholder=""
+                                    style="height: 90px; position: absolute; opacity: 0;" asp-for="@Model.AddEditItem.Itemimage" onchange="updateFileNameAndValidFile('edititemImage','editimageName','editimageValidation')">
+                                <div id="file-box"
+                                    style="height: 90px; border: 1px dashed rgb(173, 170, 170); border-radius: 5px;"
+                                    class="d-flex justify-content-center align-items-center">
+                                    <i class="bi bi-cloud-arrow-up h4 mt-3 me-2"></i><span id="editimageName">Drag and Drop or Browse files</span>
+                                </div>
+                            </div>
+                        </div>
+                        <span class="text-danger" id="editimageValidation"></span>
+                    </div>
+
+                    <div class="col-md-4 mt-3 col-12 px-2  overflow-auto"
+                        style="background-color: #fff5d7; border-radius: 5px; height: 500px;">
+                        <input type="hidden" id="editmodGroupDataInput" asp-for="@Model.AddEditItem.AddModGroupWithItems" />
+
+                        <div class="dropdown mt-2">
+                            <button class="btn btn-light dropdown-toggle w-100" type="button"
+                                id="modifierGroupDropdownEdit" data-bs-toggle="dropdown" aria-expanded="false">
+                                Select Modifier Group
+                            </button>
+                            <ul class="dropdown-menu w-100" id="modgroupAllEdit"
+                                aria-labelledby="modifierGroupDropdownEdit">
+                                <!-- Dynamic data will be loaded here -->
+                            </ul>
+                        </div>
+                        <div class="" id="editmodifierGroupDetail">
+
+                        </div>
+                    </div>
+                </div>
+                <div class="d-flex justify-content-end mt-3">
+                    <button type="submit" id="editsavebtn" class="btn text-white" style="background-color: #0066A7;"
+                        type="submit">Save</button>
+                    <button type="button" class="btn ms-2"
+                        style="border-color: #0066A7; color: #0066A7; text-decoration: none;"
+                        data-bs-dismiss="modal">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+@* Delete Item Model *@
+<div class="modal fade" id="itemdeleteModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
+    aria-labelledby="staticBackdropLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-body">
+                <input type="hidden" value="@Model.Items.ParentId" id="parentIditem" name="ParentId" >
+                <div class="d-flex justify-content-center">
+                    <img src="~/images/toppng.com-warning-icon-2400x2400.png" alt="" style="width: 10%; height: 10%;">
+                </div>
+                <div class="d-flex justify-content-center mt-3">
+                    <span class="text-muted">Are you sure you want to delete this Item?</span>
+                </div>
+                <div class="d-flex justify-content-center mt-3">
+                    <button class="btn text-white" style="background-color: #0066A7;" type="button"
+                        id="itemconfirmDeleteBtn">Yes</button>
+                    <button class="btn ms-2" style="border-color: #0066A7; color: #0066A7;" type="button"
+                        data-bs-dismiss="modal">No</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<!-- Bootstrap Bundle (includes Popper.js) -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.3/jquery.validate.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validation-unobtrusive/3.2.11/jquery.validate.unobtrusive.min.js"></script>
+
+@section scripts {
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <partial name="_ValidationScriptsPartial" />
+}
+
+<script>
+
+    function loadItems(pageSize, searchKey, pageNumber) {
+        console.log("Page Size:", pageSize, "Search Key:", searchKey, "Page Number:", pageNumber);
+
+        $.ajax({
+            url: '@Url.Action("GetItemsByCategory", "Menu")',
+            type: 'GET',
+            data: {
+                categoryId: @Model.Items.ParentId,
+                PageSize: pageSize,
+                SearchKey: searchKey,
+                PageNumber: pageNumber
+            },
+            success: function (data) {
+                $("#itemsContainer").html(data);
+            },
+            error: function (error) {
+                console.error('Error loading partial view:', error);
+                $("#itemsContainer").html("<p>Error loading items.</p>");
+            }
+        });
+    }
+    function doSearchItem() {
+        var pageSize = $("#pageSizeDropdownItem").val();
+        var searchKey = $("#searchInputItem").val();
+        var pageNumber = 1;
+
+        loadItems(pageSize, searchKey, pageNumber);
+    }
+
+    function updatePageSize() {
+        var pageSize = $("#pageSizeDropdownItem").val();
+        var searchKey = $("#searchInputItem").val();
+        var pageNumber = @Model.Items.PageNumber;
+
+        loadItems(pageSize, searchKey, pageNumber);
+    }
+
+    function PanginationBtn(direction) {
+        var pageSize = $("#pageSizeDropdownItem").val();
+        var searchKey = $("#searchInputItem").val();
+        var pageNumber = @Model.Items.PageNumber;
+
+        if (direction === "back") {
+            pageNumber -= 1;
+        } else {
+            pageNumber += 1;
+        }
+
+        loadItems(pageSize, searchKey, pageNumber);
+    }
+
+    document.getElementById("defaultTaxToggle").addEventListener("change", function () {
+        if (this.checked) {
+            this.value = "true";
+        } else {
+            this.value = "false";
+        }
+    });
+    document.getElementById("availableToggle").addEventListener("change", function () {
+        if (this.checked) {
+            this.value = "true";
+        } else {
+            this.value = "false";
+        }
+    });
+    @* -------------------------------------------------------------- Add Item--------------------------------------------------------------------- *@
+    @* -----------------open add item model ----------------- *@
+    function openAddItemModal() {
+        var modal = new bootstrap.Modal(document.getElementById("additemModal"));
+        modal.show();
+
+        // Get the default category id from the hidden input
+        var defaultCategoryId = document.getElementById("parentId").value;
+
+        // Set it as selected in the category dropdown
+        var categoryDropdown = document.getElementById("categoryDropdown");
+        categoryDropdown.value = defaultCategoryId;
+
+    }
+
+
+    function GetModGroupData() {
+        var modgroupAll = [];
+        $('.mod-group-detail').each(function () {
+            var modifierGroupId = $(this).find('.deleteOneGroup').data('modgroupid');
+            var minValue = $(this).find('.min-Select').val();
+            var maxValue = $(this).find('.max-Select').val();
+            modgroupAll.push({
+                ModifierGroupId: modifierGroupId,
+                min: minValue,
+                max: maxValue
+            });
+        });
+        console.log(modgroupAll);
+        return modgroupAll; // Return the collected data
+    }
+
+    $(document).ready(function () {
+        $('#additemform').on('submit', function (e) {
+            e.preventDefault();
+
+            var formElement = document.querySelector(".additemform");
+            var formData = new FormData(formElement);
+
+            // Get Modifier Group Data and append it
+            var modGroupData = GetModGroupData();
+            formData.append("AddModGroupWithItems", JSON.stringify(modGroupData));
+           
+            $.ajax({
+                url: '@Url.Action("AddItemsPost", "Menu")',
+                type: 'POST',
+                data: formData,
+                contentType: false,
+                processData: false,
+                success: function (data) {
+                    if (data.success) {
+                        console.log('Item added successfully:', data);
+                        window.location.href = data.redirectUrl;
+                    } else {
+                        toastr.error("Failed to add item. Please check the inputs.");
+                    }
+                },
+                error: function (error) {
+                    console.error('Error adding item:', error);
+                    alert("An error occurred while adding the item.");
+                }
+            });
+        });
+    });
+
+    document.getElementById("itemImage").addEventListener("change", function () {
+        let fileLabel = document.getElementById("fileLabel");
+        if (this.files.length > 0) {
+            fileLabel.style.border = "2px solid green";
+        } else {
+            fileLabel.style.border = "2px solid rgba(112, 128, 144, 0.123)";
+        }
+    });
+
+    @* -------------------------------------------------------------- Edit Item--------------------------------------------------------------------- *@
+        function GetModGroupDataEdit() {
+        var modgroupAll = [];
+        $('.mod-group-detail-edit').each(function () {
+            var modifierGroupId = $(this).find('.deleteOneGroup').data('modgroupid');
+            var minValue = $(this).find('.min-Select').val();
+            var maxValue = $(this).find('.max-Select').val();
+            modgroupAll.push({
+                ModifierGroupId: modifierGroupId,
+                min: minValue,
+                max: maxValue
+            });
+        });
+        console.log(modgroupAll);
+        return modgroupAll; // Return the collected data
+    }
+    var arrayToEdit = [];
+
+    function GetItemDetails(itemId) {
+        $.ajax({
+            url: '/Menu/GetItemById',  // Controller action to get item details
+            type: 'GET',
+            data: { id: itemId },
+            success: function (data) {
+                if (data) {
+                    console.log("Fetched Item Data:", data);
+                    $('#editItemId').val(data.itemId);
+                    $('#editcategoryDropdown').val(data.categoryId);
+                    $('#editname').val(data.itemname);
+                    $('#edititemTypeDropdown').val(data.itemtype);
+                    $('#editrate').val(data.rate);
+                    $('#editquantity').val(data.quantity);
+                    $('#editunitDropdown').val(data.unitId);
+                    $('#editavailableToggle').prop('checked', data.isavailable).val(data.isavailable);
+                    $('#editavailableToggle').next('input[type="hidden"]').val(data.isavailable);
+                    $('#editdefaultTaxToggle').prop('checked', data.defaulttax).val(data.defaulttax);
+                    $('#editdefaultTaxToggle').next('input[type="hidden"]').val(data.defaulttax);
+
+                    $('#edittaxpercentage').val(data.taxpercentage);
+                    $('#editshortcode').val(data.shortcode);
+                    $('#editdescription').val(data.itemdescription);
+                    $('#edititemImage').val(data.itemimage);
+                    $('#editmodifierGroupDetail').empty();
+                    arrayToEdit = []; // Clear previous data
+
+                    console.log(data.addModGroupWithItems);
+
+                    // Load modifier group details
+                    if (data.addModGroupWithItems && data.addModGroupWithItems.length > 0) {
+                        data.addModGroupWithItems.forEach(function (group) {
+                            arrayToEdit.push(group.modifierGroupId);
+                            GetModifierGroupDetailsForEdit(group.modifierGroupId, itemId);
+                        });
+                    }
+
+                    // Fetch and populate modifier group dropdown
+                    LoadModifierGroups();
+                    var modal = new bootstrap.Modal(document.getElementById("edititemModal"));
+                    modal.show();
+                }
+            },
+            error: function () {
+                alert("Error fetching item details.");
+            }
+        });
+    }
+
+    // Function to fetch and populate modifier groups
+    function LoadModifierGroups() {
+        $.ajax({
+            url: '/Menu/GetModifierGroups', // Correct URL
+            type: 'GET',
+            dataType: 'json',
+            success: function (response) {
+                console.log("Modifier Groups Fetched:", response);
+                var dropdown = $('#modgroupAllEdit');
+                dropdown.empty(); // Clear previous items
+
+                if (!response.success) {
+                    dropdown.append('<li class="dropdown-item text-danger">' + response.message + '</li>');
+                    return;
+                }
+
+                var data = response.data;
+                if (data.length === 0) {
+                    dropdown.append('<li class="dropdown-item">No data available</li>');
+                } else {
+                    $.each(data, function (index, modgroup) {
+                        let isChecked = arrayToEdit.includes(modgroup.modifierGroupId) ? "checked" : "";
+                        dropdown.append(
+                            `<li>
+                            <label class="dropdown-item">
+                                <input type="checkbox" value="${modgroup.modifierGroupId}" class="me-2"
+                                    name="editmodgroupCheckbox" ${isChecked}> ${modgroup.modifierGroupName}
+                            </label>
+                        </li>`
+                        );
+                    });
+                }
+            },
+            error: function (xhr, status, error) {
+                console.error("AJAX Error:", xhr.responseText);
+                alert('Failed to load modifier groups.');
+            }
+        });
+    }
+
+    function GetModifierGroupDetailsForEdit(modifierGroupId, itemId) {
+        $.ajax({
+            url: '/Menu/GetModifierGroupDetails',
+            type: 'GET',
+            data: { modifierGroupId: modifierGroupId, itemId: itemId },
+            success: function (response) {
+                if ($('#editmodifierGroupDetail').find(`.mod-group-${modifierGroupId}`).length === 0) {
+                    $('#editmodifierGroupDetail').append(
+                        `<div class="mod-group-${modifierGroupId} mod-group-detail-edit mt-2">
+                        ${response}
+                    </div>`
+                    );
+                }
+            },
+            error: function () {
+                console.log("Error loading modifier group details.");
+            }
+        });
+    }
+
+    $(document).ready(function () {
+        $("#edititemform").submit(function (e) {
+            e.preventDefault();
+            var formData = new FormData(this); // Create FormData object for handling file uploads
+            // Get Modifier Group Data and append it
+            var modGroupData = GetModGroupDataEdit();
+            formData.append("AddModGroupWithItems", JSON.stringify(modGroupData));
+
+            $.ajax({
+                url: '/Menu/EditItems',
+                type: 'POST',
+                data: formData,
+                processData: false,
+                contentType: false,
+                success: function (response) {
+                    if (response.success) {
+                        $('#edititemModal').modal('hide');
+                        window.location.href = response.url;
+                        @* location.reload(); *@
+                    }
+                },
+                error: function (xhr, status, error) {
+                    console.log(xhr.responseText);
+                    alert("An error occurred while saving the item.");
+                }
+            });
+        });
+    });
+
+    $(document).ready(function () {
+        $('#edititemModal').on('hidden.bs.modal', function () {
+            arrayToEdit = []; // Reset array when modal is closed
+        });
+    });
+    document.getElementById("editdefaultTaxToggle").addEventListener("change", function () {
+        if (this.checked) {
+            this.value = "true";
+        } else {
+            this.value = "false";
+        }
+    });
+    document.getElementById("editavailableToggle").addEventListener("change", function () {
+        if (this.checked) {
+            this.value = "true";
+        } else {
+            this.value = "false";
+        }
+    });
+
+    @* --------------------------------------------------------Delete And Mass Delete Item--------------------------------------------------------- *@
+        @* -------------------------checkbox for delete----------------------- *@ 
+        $(document).ready(function () {
+            // Handle main checkbox click
+            $('.main-check').on('click', function () {
+                console.log("main-checkfffffff");
+                var isChecked = $(this).is(':checked');
+                $('.inner-check').prop('checked', isChecked);
+            });
+
+            // Handle individual checkbox clicks
+            $(document).on('click', '.inner-check', function () {
+                if (!$(this).is(':checked')) {
+                    // Uncheck main checkbox if one inner checkbox is unchecked
+                    $('.main-check').prop('checked', false);
+                } else {
+                    // Check if all inner checkboxes are checked
+                    var allChecked = $('.inner-check').length === $('.inner-check:checked').length;
+                    $('.main-check').prop('checked', allChecked);
+                }
+            });
+        });
+    
+    @* --------------------------------------------------------ModifierGroup Checkbox------------------------------------------------------------------ *@
+
+        $('#modgroupAll').on('change', 'input[name="modgroupCheckbox"]', function () {
+            var modifierGroupId = $(this).val();
+            var isChecked = $(this).prop('checked');
+
+            if (isChecked) {
+                console.log(modifierGroupId);
+                $.ajax({
+                    url: '/Menu/GetModifierGroupDetails',
+                    type: 'GET',
+                    data: { modifierGroupId: modifierGroupId },
+                    success: function (response) {
+                        if ($('#modifierGroupDetail').find(`.mod-group-${modifierGroupId}`).length === 0) {
+                            $('#modifierGroupDetail').append(
+                                `<div class="mod-group-${modifierGroupId} mod-group-detail mt-2">
+                            ${response}
+                        </div>`
+                            );
+                        }
+                    },
+                    error: function () {
+                        console.log("Error loading modifier group details.");
+                    }
+                });
+            } else {
+                $('#modifierGroupDetail').find(`.mod-group-${modifierGroupId}`).remove();
+            }
+        });
+
+
+    $('#modgroupAllEdit').on('change', 'input[name="editmodgroupCheckbox"]', function () {
+        var modifierGroupId = $(this).val();
+        var isChecked = $(this).prop('checked');
+
+        if (isChecked) {
+            console.log(modifierGroupId);
+            $.ajax({
+                url: '/Menu/GetModifierGroupDetails',
+                type: 'GET',
+                data: { modifierGroupId: modifierGroupId },
+                success: function (response) {
+                    if ($('#editmodifierGroupDetail').find(`.mod-group-${modifierGroupId}`).length === 0) {
+                        $('#editmodifierGroupDetail').append(
+                            `<div class="mod-group-${modifierGroupId} mod-group-detail-edit mt-2">
+                            ${response}
+                        </div>`
+                        );
+                    }
+                },
+                error: function () {
+                    console.log("Error loading modifier group details.");
+                }
+            });
+        } else {
+            $('#editmodifierGroupDetail').find(`.mod-group-${modifierGroupId}`).remove();
+        }
+    });
+
+
+</script>

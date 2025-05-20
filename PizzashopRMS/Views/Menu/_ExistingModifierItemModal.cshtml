@@ -1,0 +1,180 @@
+@model DataAccessLayer.ViewModels.MenuViewModel
+<div class="table-responsive">
+    <table class="table">
+        <thead>
+            <tr>
+                <th scope="col"><input class="form-check-input main-check" type="checkbox" value=""
+                        id="selectAllCheckbox"></th>
+                <th scope="col">Name</th>
+                <th scope="col">Unit</th>
+                <th scope="col">Rate</th>
+                <th scope="col">Quantity</th>
+
+            </tr>
+        </thead>
+        <tbody id="itemsTableBodyAll">
+            @foreach (var item in Model.ModifierItemAll.List)
+            {
+                <tr>
+                    <td>
+                        <input class="form-check-input inner-check  inner-check-new" type="checkbox" data-id="@item.ModifierItemId">
+                    </td>
+                    <td>@item.ModifierItemName</td>
+                    <td>@item.ModifierUnitname</td>
+                    <td>@item.Rate</td>
+                    <td>@item.Quantity</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+<div class="main-pagination ">
+    <div class="item-show ">
+        <nav aria-label="Page navigation example">
+            <div class="pagination ">
+                <span class="align-self-center">Items Per Page
+                    :</span>
+                <select class="form-select form-select-sm ms-2 align-self-center" aria-label="Small select example"
+                    style=" width: unset; " id="pageSizeDropdownModifierAll" onchange="updatePagePerSizeAll()">
+                    @if (Model.ModifierItemViewModel?.PageSize != null)
+                    {
+                        <option value="1" selected="@(Model.ModifierItemAll.PageSize == 1 ? true : false)">
+                            1
+                        </option>
+                        <option value="3" selected="@(Model.ModifierItemAll.PageSize == 3 ? true : false)">
+                            3
+                        </option>
+                        <option value="5" selected="@(Model.ModifierItemAll.PageSize == 5 ? true : false)">
+                            5
+                        </option>
+                        <option value="10" selected="@(Model.ModifierItemAll.PageSize == 10 ? true : false)">
+                            10</option>
+                        <option value="25" selected="@(Model.ModifierItemAll.PageSize == 25 ? true : false)">
+                            25</option>
+                    }
+                </select>
+            </div>
+        </nav>
+    </div>
+    <div class="showing-page">
+        <nav aria-label="Page navigation example">
+            <div class="pagination ">
+                <span class=" ms-2  align-self-center">Showing
+                    @{
+                        var startRecord = (Model.ModifierItemAll.PageNumber - 1) *
+                        Model.ModifierItemAll.PageSize + 1;
+                        var endRecord = Model.ModifierItemAll.PageNumber *
+                        Model.ModifierItemAll.PageSize;
+                        if (endRecord > Model.ModifierItemAll.Count)
+                            endRecord = Model.ModifierItemAll.Count;
+
+                        if (Model.ModifierItemAll.Count == 0)
+                        {
+                            startRecord = 0;
+                            endRecord = 0;
+                        }
+                    }
+                    <span style="color: green;" class="me-1">@startRecord -
+                        @endRecord</span> of <span style="color: red;" class="ms-1">@Model.ModifierItemAll.Count</span>
+                </span>
+                <button class="btn border ms-2  align-self-center" type="submit"
+                    onclick="PanginationBtnModifierAll('back')"><i class="bi bi-chevron-left "></i>
+                </button>
+                <button class="btn border ms-2  align-self-center" type="submit"
+                    onclick="PanginationBtnModifierAll('next')"><i class="bi bi-chevron-right"></i>
+                </button>
+            </div>
+        </nav>
+    </div>
+</div>
+
+<script>
+    $(document).ready(function () {
+        document.querySelectorAll(".inner-check").forEach(function (checkbox) {
+            const id = parseInt(checkbox.getAttribute('data-id'), 10);
+            // Convert selectedIds to numbers before checking
+            const selectedIdsAsNumbers = selectedIds.map(Number);
+            if (selectedIdsAsNumbers.includes(id)) {
+                checkbox.checked = true;
+            }
+        });
+    });
+
+
+    function loadModifierAll(pageSize, searchKey, pageNumber) {
+        console.log("Page Size:", pageSize, "Search Key:", searchKey, "Page Number:", pageNumber);
+        $.ajax({
+            url: '@Url.Action("GetModifierItemsAllByModifierGroup", "Menu")',
+            type: 'GET',
+            data: {
+                PageSize: pageSize,
+                SearchKey: searchKey,
+                PageNumber: pageNumber
+            },
+            success: function (data) {
+                if ($('#addmodifer').hasClass('show')) {
+                  
+                    $("#GetAllModifierItems").html(data);
+                }
+            },
+            error: function (error) {
+                console.error('Error loading partial view:', error);
+            }
+        });
+    }
+
+    function updatePagePerSizeAll() {
+        var pageSize = $("#pageSizeDropdownModifierAll").val();
+        var searchKey = $("#searchInputModifierAll").val();
+        var pageNumber = @Model.ModifierItemAll.PageNumber;
+
+        loadModifierAll(pageSize, searchKey, pageNumber);
+    }
+
+    function PanginationBtnModifierAll(direction) {
+        var pageSize = $("#pageSizeDropdownModifierAll").val();
+        var searchKey = $("#searchInputModifierAll").val();
+        var pageNumber = @Model.ModifierItemAll.PageNumber;
+
+        if (direction === "back") {
+            pageNumber -= 1;
+        } else {
+            pageNumber += 1;
+        }
+        loadModifierAll(pageSize, searchKey, pageNumber);
+    }
+
+    function doSearchModifierAll() {
+        var pageSize = $("#pageSizeDropdownModifierAll").val();
+        var searchKey = $("#searchInputModifierAll").val();
+        var pageNumber = 1;
+
+        loadModifierAll(pageSize, searchKey, pageNumber);
+    }
+
+    @* ---------------------checkbox for modifier group add existing list-------------------------- *@
+
+        $(document).ready(function () {
+            // Handle main checkbox click
+           $('.main-check').on('click', function () {
+                var isChecked = $(this).is(':checked');
+                $('.inner-check-new').each(function () {
+                    $(this).prop('checked', isChecked).trigger('change'); 
+                });
+            });
+
+            // Handle individual checkbox clicks
+            $(document).on('click', '.inner-check', function () {
+                if (!$(this).is(':checked')) {
+                    // Uncheck main checkbox if one inner checkbox is unchecked
+                    $('.main-check').prop('checked', false);
+                } else {
+                    // Check if all inner checkboxes are checked
+                    var allChecked = $('.inner-check').length === $('.inner-check:checked').length;
+                    $('.main-check').prop('checked', allChecked);
+                }
+            });
+        });
+
+
+</script>

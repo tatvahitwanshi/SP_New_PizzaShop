@@ -1,0 +1,78 @@
+.order-container {
+    background-color: #F2F2F2;
+    padding: 20px 20px;
+}
+
+.special-color {
+    color: #0066A7;
+}
+
+.search-box {
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+}
+
+#search-order-img {
+    height: 20px;
+    cursor: pointer;
+}
+
+#export-btn {
+    background-color: #0066A7;
+    color: white;
+    border-radius: 4px;
+    padding: 10px;
+    text-align: center;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+#search-btn {
+    background-color: #0066A7;
+    color: white;
+    border-radius: 4px;
+    padding: 10px;
+    text-align: center;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+#clear-btn {
+    color: #0066A7;
+    background-color: white;
+    border:2px solid #0066A7;
+    border-radius: 4px;
+    padding: 10px;
+    text-align: center;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.custom-select {
+    color: grey !important; 
+}
+
+.custom-select option {
+    color: black !important;
+}
+
+.custom-select .select-all {
+    color: grey !important;
+}
+
+.form-floating>.form-control:focus~label, .form-floating>.form-control:not(:placeholder-shown)~label, .form-floating>.form-select~label {
+    opacity: .65 !important;
+    transform: scale(.85) translateY(-.8rem) translateX(.15rem) !important;
+}
+
+.custom-btn
+{
+    border: none !important; 
+    outline: none !important; 
+    background-color: transparent !important;
+}
+  

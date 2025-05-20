@@ -1,0 +1,65 @@
+@model DataAccessLayer.ViewModels.WaitingToken
+
+<div class="special-color fw-bold fs-5">Customer Detail</div>
+<form class="modal-body m-0 p-0" method="post" id="assignTokenForm">
+    <input type="text" id="tokenIdAssign" asp-for="TokenId" hidden>
+    <input type="text" id="tableIdAssign" name="tableIds" hidden>
+
+    <div class="row mt-0">
+        <div class="col-12">
+            <div class="row">
+                <div class="col-12 form-floating mt-3">
+                    <input type="email" class="form-control assign-form-input" id="tokenEmailAssign" placeholder="Name" asp-for="CustomerEmail" oninput="completeAllDetailAssgin(this.value)">
+                    <label for="tokenEmailAssign">Email*</label>
+                    <span class="text-danger" asp-validation-for="CustomerEmail"></span>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-12 form-floating mt-3">
+                    <input type="text" class="form-control assign-form-input" id="tokenNameAssign" placeholder="Name" asp-for="CustomerName" >
+                    <label for="tokenNameAssign">Name*</label>
+                    <span class="text-danger" asp-validation-for="CustomerName"></span>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-12 form-floating mt-3">
+                    <input type="number" class="form-control assign-form-input" id="tokenMobileNoAssign" placeholder="Name" asp-for="MobileNo" >
+                    <label for="tokenMobileNoAssign">Mobile No.*</label>
+                    <span class="text-danger" asp-validation-for="MobileNo"></span>
+                </div>
+            </div>
+
+            <div class="row gx-2">
+                <div class="col-md-6 col-12 form-floating mt-3">
+                    <input type="number" class="form-control assign-form-input" id="numberOfPersonAssign" placeholder="Name" min="0" step="1" asp-for="NumberOfPersons">
+                    <label for="numberOfPersonAssign" class="ps-1">No. of Person(s)*</label>
+                    <span class="text-danger" asp-validation-for="NumberOfPersons"></span>
+                </div>
+                <div class="col-md-6 col-12 form-floating mt-3">
+                    <select class="form-select assign-form-input" id="sectionIdAssign" aria-label="Select Food Category" tabindex="-1" name="SectionId" style="width: 100% !important; pointer-events: none; background-color: rgb(241, 241, 241);" asp-for="SectionId">
+                        <option disabled selected>Section</option>
+                        @if (Model.SectionList != null)
+                        {
+                            @foreach (var sec in Model.SectionList)
+                            {
+                                <option value="@sec.SectionId">@sec.SectionName</option>
+                            }
+                        }
+                    </select>
+                    <label for="sectionIdAssign" class="ps-1">Section*</label>
+                    <span class="text-danger" asp-validation-for="SectionId"></span>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <div class="d-flex justify-content-end mt-3 gap-1">
+        <button type="submit" class="save-cancel-btn fw-semibold save-btn">Assign</button>
+        <button type="button" class="save-cancel-btn fw-semibold cancel-btn" data-bs-dismiss="offcanvas">Cancel</button>
+    </div>
+</form>
+
+
+
+<script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.min.js"></script>

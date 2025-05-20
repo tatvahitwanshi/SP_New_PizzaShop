@@ -1,0 +1,48 @@
+.main-block {
+    height: 100vh;
+}
+#right-side {
+    background-color: rgba(135, 207, 235, 0.37)
+}
+.logo-img {
+    height: 5vh;
+}
+@media (min-width: 992px) {
+    .pizza-img {
+        width: -webkit-fill-available;
+        height: -webkit-fill-available;
+    }
+
+}
+@media (max-width: 991px) {
+
+    .main-block {
+        flex-direction: column;
+    }
+
+    .pizza-img {
+        width: 100%;
+        height: 100vh;
+        object-fit: cover;
+        position: relative;
+    }
+
+    #inner-right-container {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 90%;
+        background-color: rgba(255, 255, 255, 0.8);
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+        
+    }
+
+    #right-side {
+        width: 1px;
+        height: 1px;
+    }
+
+}

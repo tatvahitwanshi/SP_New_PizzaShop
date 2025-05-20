@@ -1,0 +1,53 @@
+@model DataAccessLayer.ViewModels.ModifierDetailsForItem;
+
+<div class="modal-header py-3">
+    <h5 class="fw-bold m-0" id="staticBackdropLabel">@Model.ItemName</h5>
+    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+</div>
+<div class="modal-body">
+    @if(Model.ModGroupList != null)
+    {
+        @foreach(var modGroup in Model.ModGroupList)
+        {
+            <div class="mb-3">
+                <div class="modifierGroupHeader">
+                    <div class="modifierGroupName">@modGroup.ModGroupName</div>
+                    <div class="modifierGroupDetails">(You can choose Minimum - @modGroup.Min & Maximum - @modGroup.Max Options)</div>
+                </div>
+
+                <div class="item-container d-flex gap-2 flex-wrap">
+
+                    @if(modGroup.ModifierList != null)
+                    {
+                        @foreach(var modItem in  modGroup.ModifierList)
+                        {
+                            <div class="item-card d-flex @(Model.ItemType == "veg" ? "color-veg" : "color-non-veg") modifier-card"
+                                 data-groupid = @modGroup.ModGroupId
+                                 data-min="@modGroup.Min"
+                                 data-max="@modGroup.Max"
+                                 data-modifierid=@modItem.ModifierId
+                                 data-modifiername = "@modItem.ModifierName"
+                                 data-price = @modItem.Price
+                                 onclick="toggleModifier(this)">
+
+                                <div class="d-flex flex-column flex-grow-1 justify-content-center item-values">
+                                    <span class="fw-bold"> @modItem.ModifierName </span>
+                                    <div class="d-flex align-items-center justify-content-between">
+                                        <span>₹@modItem.Price</span>
+                                    </div>
+                                </div>
+
+                            </div>
+                        }
+                    }
+                </div>
+            </div>
+
+        }
+    }
+
+</div>
+
+<script id="modifierlist-model-json" type="application/json">
+    @Html.Raw(Json.Serialize(Model))
+</script>

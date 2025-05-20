@@ -1,0 +1,258 @@
+@model DataAccessLayer.ViewModels.AddUserViewModel
+
+@{
+    Layout = "~/Views/Shared/_LayoutCustom.cshtml";
+    ViewData["Title"] = "Add New User";
+}
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.5.0/font/bootstrap-icons.css" />
+    <link rel="stylesheet" href="~/css/userlist.css">
+</head>
+
+<body>
+    <div class="container-fluid p-4">
+        <div class="row">
+            <div class="col-lg-4 col-sm-6 h2 fw-bold" style="color: #0066A7;">
+                Add New User
+            </div>
+            <div class="col-lg-8 col-sm-6 text-end">
+                <a class="btn " style="border-color: #0066A7; color: #0066A7; text-decoration: none;"
+                    asp-action="UserListView" type="submit"><i class="bi bi-chevron-left"></i>Back</a>
+                </a>
+            </div>
+        </div>
+        <div class="row mt-3 bg-white shadow-sm p-4">
+            <div class="col">
+                <form asp-action="AddUserView" method="post" enctype="multipart/form-data">
+                    <div class="row">
+                        <div class="col-lg-6 col-sm-12">
+                            <div class="form-floating mb-3">
+                                <input asp-for="Firstname" class="form-control" placeholder="First Name" required>
+                                <label asp-for="Firstname">First Name</label>
+                                <span asp-validation-for="Firstname" class="text-danger"></span>
+                            </div>
+                        </div>
+                        <div class="col-lg-6 col-sm-12">
+                            <div class="form-floating mb-3">
+                                <input asp-for="Lastname" class="form-control" placeholder="Last Name">
+                                <label asp-for="Lastname">Last Name</label>
+                                <span asp-validation-for="Lastname" class="text-danger"></span>
+
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-lg-6 col-sm-12">
+                            <div class="form-floating mb-3">
+                                <input asp-for="Username" class="form-control" placeholder="Username" required>
+                                <label asp-for="Username">Username</label>
+                                <span asp-validation-for="Username" class="text-danger"></span>
+                            </div>
+                        </div>
+                        <div class="col-lg-6 col-sm-12">
+                            <div class="form-floating mb-3">
+
+                                <select class="form-select mb-3" aria-label="Default select example" asp-for="Roleid"
+                                    asp-items="@(new SelectList(Model.Roles, "Roleid", "Rolename"))">
+                                    <option value="">Select Role</option>
+                                </select>
+                                <label for="floatingSelect">Role</label>
+                                <span asp-validation-for="Roleid" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <div class="row">
+                        <div class="col-lg-6 col-sm-12">
+                            <div class="form-floating mb-3">
+                                <input asp-for="Email" type="email" class="form-control" placeholder="Email" required>
+                                <label>Email</label>
+                                <span asp-validation-for="Email" class="text-danger"></span>
+
+                            </div>
+                        </div>
+                        <div class="col-lg-6 col-sm-12">
+                            <div class="form-floating">
+                                <input asp-for="Password" type="password" class="form-control" placeholder="Password"
+                                    required>
+                                <label asp-for="Password">Password</label>
+                                <span asp-validation-for="Password" class="text-danger"></span>
+                            </div>
+                        </div>
+                    </div>
+
+
+                    <div class="row">
+                        <div class="col d-flex justify-content-center mb-3">
+                            <label for="Useraddimage" id="fileLabel" class="btn w-100 p-4"
+                                style="border: 2px solid rgba(112, 128, 144, 0.123); border-style: dashed;">
+                                <i class="bi bi-cloud-arrow-up h3"></i><br> <span id="useraddName">Browse File</span>
+                                <input type="file" id="Useraddimage" name="Profilepic" class="d-none"
+                                    asp-for="Profilepic" onchange="updateFileNameAndValidFile('Useraddimage','useraddName','useraddimageValidation')">
+                            </label>
+                        </div>
+                    </div>
+                    <span asp-validation-for="Profilepic" class="text-danger" id="useraddimageValidation"></span>
+
+                    <input type="hidden" asp-for="CreatedBy" />
+                    <div class="row">
+                        <div class="col-lg-4 col-sm-12">
+                            <div class="form-floating mb-3">
+                                <select id="countryDropdown" asp-for="Countryid" class="form-control">
+                                    <option value="">Select Country</option>
+                                    @foreach (var country in Model.Countries)
+                                    {
+                                        <option value="@country.Countryid">@country.Countryname</option>
+                                    }
+                                </select>
+                                <label asp-for="Countryid">Country</label>
+                            </div>
+                        </div>
+                        <div class="col-lg-4 col-sm-12">
+                            <div class="form-floating mb-3">
+                                <select id="stateDropdown" asp-for="Stateid" class="form-control">
+                                    <option value="">Select State</option>
+                                </select>
+                                <label asp-for="Stateid">State</label>
+                                <span id="countryError" class="text-danger" style="display:none;"></span>
+
+                            </div>
+                        </div>
+                        <div class="col-lg-4 col-sm-12">
+                            <div class="form-floating mb-3">
+                                <select id="cityDropdown" asp-for="Cityid" class="form-control">
+                                    <option value="">Select City</option>
+                                </select>
+                                <label asp-for="Cityid">City</label>
+                                <span id="stateError" class="text-danger" style="display:none;"></span>
+                                <!-- Error Message for State -->
+
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-lg-4 col-sm-12">
+                            <div class="form-floating mb-3">
+                                <input asp-for="Zipcode" type="text" class="form-control"
+                                    placeholder="Zip Code">
+                                <label asp-for="Zipcode">Zip Code</label>
+                                <span asp-validation-for="Zipcode" class="text-danger"></span>
+                            </div>
+                        </div>
+                        <div class="col-lg-4 col-sm-12">
+                            <div class="form-floating mb-3">
+                                <input asp-for="Address" class="form-control" placeholder="Address">
+                                <label asp-for="Address">Address</label>
+                                <span asp-validation-for="Address" class="text-danger"></span>
+                            </div>
+                        </div>
+                        <div class="col-lg-4 col-sm-12">
+                            <div class="form-floating mb-3">
+                                <input asp-for="Phone" type="tel" class="form-control" placeholder="Phone">
+                                <label asp-for="Phone">Phone</label>
+                                <span asp-validation-for="Phone" class="text-danger"></span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col mb-3">
+                            <button type="submit" class="btn text-white" style="background-color: #0066A7;">Create
+                                User</button>
+                           
+                            <a class="btn " style="border-color: #0066A7; color: #0066A7; text-decoration: none;"
+                                asp-action="UserListView">Cancel</a>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css" rel="stylesheet" />
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+    $(document).ready(function () {
+        $("#countryDropdown").change(function () {
+            var countryId = $(this).val();
+            $("#stateDropdown").html('<option value="">Loading...</option>');
+            $("#cityDropdown").html('<option value="">Select City</option>');
+
+            $.getJSON("/UserList/GetStates", { countryId: countryId }, function (data) {
+                $("#stateDropdown").html('<option value="">Select State</option>');
+                $.each(data, function (index, item) {
+                    $("#stateDropdown").append('<option value="' + item.stateid + '">' + item.statename + '</option>');
+                });
+            });
+        });
+
+        $("#stateDropdown").change(function () {
+            var stateId = $(this).val();
+            $("#cityDropdown").html('<option value="">Loading...</option>');
+
+            $.getJSON("/UserList/GetCities", { stateId: stateId }, function (data) {
+                $("#cityDropdown").html('<option value="">Select City</option>');
+                $.each(data, function (index, item) {
+                    $("#cityDropdown").append('<option value="' + item.cityid + '">' + item.cityname + '</option>');
+                });
+            });
+        });
+    });
+
+    $(document).ready(function () {
+        // Toastr configuration
+        toastr.options = {
+            "closeButton": true,
+            "progressBar": true,
+            "positionClass": "toast-top-right",
+            "timeOut": "3000"
+        };
+
+        // When the user selects a state without selecting a country
+        $("#stateDropdown").on("mousedown", function (e) {
+            var countryId = $("#countryDropdown").val();
+            if (!countryId) {
+                e.preventDefault(); // Prevents the dropdown from opening
+                toastr.error("Please select a country first.");
+            }
+        });
+
+        // When the user selects a city without selecting a state
+        $("#cityDropdown").on("mousedown", function (e) {
+            var stateId = $("#stateDropdown").val();
+            if (!stateId) {
+                e.preventDefault(); // Prevents the dropdown from opening
+                toastr.error("Please select a state first.");
+            }
+        });
+    });
+
+</script>
+<script>
+    document.getElementById("fileUpload").addEventListener("change", function () {
+        let fileLabel = document.getElementById("fileLabel");
+        if (this.files.length > 0) {
+            fileLabel.style.border = "2px solid green"; // Change border color when a file is selected
+        } else {
+            fileLabel.style.border = "2px solid rgba(112, 128, 144, 0.123)"; // Reset border color
+        }
+    });
+</script>
+@section Scripts {
+
+    <partial name="_ValidationScriptsPartial" />
+
+}

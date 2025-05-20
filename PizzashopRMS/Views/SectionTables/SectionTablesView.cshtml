@@ -1,0 +1,342 @@
+@model DataAccessLayer.ViewModels.SectionTablesViewModal
+@{
+    Layout = "~/Views/Shared/_LayoutCustom.cshtml";
+    ViewData["Title"] = " SectionTables Page";
+    ViewBag.Active = "SectionTables";
+}
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+    <!-- Bootstrap Font Icon CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.5.0/font/bootstrap-icons.css" />
+    <link rel="stylesheet" href="~/css/sectiontable.css">
+    <title>SectionTables Page</title>
+
+</head>
+
+<body>
+    <div class="container-fluid p-4">
+        <div class="row ">
+            <div class="col-4 h2  fw-bold" style="color: #0066A7;">
+                Sections/Tables
+            </div>
+        </div>
+        <div class="row bg-white p-2 ">
+            <partial name="_PartialSection"></partial>
+        </div>
+    </div>
+
+
+</body>
+
+</html>
+<script src="~/lib/jquery-validation/dist/jquery.validate.min.js"></script>
+<script src="~/lib/jquery-validation/dist/additional-methods.min.js"></script>
+<script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"
+    integrity="sha512-VEd+nq25CkR676O+pLBnDW09R7VQX9Mdiij052gVCp5yVH3jGtH70Ho/UUv4mJDsEdTvqRCFZg0NKGiojGnUCw=="
+    crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css" rel="stylesheet" />
+
+
+<!-- Model Add Section -->
+<div class="modal fade" id="addsection" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
+    aria-labelledby="staticBackdrop1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h1 class="modal-title fs-5" id="staticBackdropLabel">Add Section</h1>
+                <button type="button" class="btn-close closeAddSection" ></button>
+            </div>
+            <div class="modal-body">
+                <form method="post" asp-action="AddSections" asp-controller="SectionTables">
+                    <input type="hidden" asp-for="AddEditSection.SectionId"> <!-- Hidden ID Field -->
+
+                    <div class="form-floating mb-3">
+                        <input type="text" class="form-control" asp-for="AddEditSection.Sectionname"
+                            placeholder="Section Name">
+                        <label asp-for="AddEditSection.Sectionname">Name</label>
+                        <span class="text-danger validation-message"
+                            asp-validation-for="AddEditSection.Sectionname"></span>
+                    </div>
+
+                    <div class="form-floating">
+                        <textarea class="form-control" asp-for="AddEditSection.Sectiondescription"
+                            placeholder="Enter Description"></textarea>
+                        <label asp-for="AddEditSection.Sectiondescription">Description</label>
+                        <span class="text-danger validation-message"
+                            asp-validation-for="AddEditSection.Sectiondescription"></span>
+                    </div>
+
+                    <div class="col mt-3 mb-3 d-flex justify-content-end">
+                        <button class="btn text-white me-2" style="background-color: #0066A7;" type="submit"
+                            id="saveSectionBtn">Save</button>
+                        <button class="btn closeAddSection" style="border-color: #0066A7; color: #0066A7;" type="button"
+                            data-bs-dismiss="modal">Cancel</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Model Edit Section -->
+<div class="modal fade" id="editsection" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
+    aria-labelledby="staticBackdropLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h1 class="modal-title fs-5">Edit Section</h1>
+                <button type="button" class="btn-close closeEditSection" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form method="post" asp-action="UpdateSection" asp-controller="SectionTables">
+                    <input type="hidden" id="editSectionId" asp-for="AddEditSection.SectionId">
+
+                    <div class="form-floating mb-3">
+                        <input type="text" class="form-control" id="editSectionName"
+                            asp-for="AddEditSection.Sectionname" placeholder="Section Name" required>
+                        <label asp-for="AddEditSection.Sectionname">Name</label>
+                        <span class="text-danger" asp-validation-for="AddEditSection.Sectionname"></span>
+                    </div>
+
+                    <div class="form-floating">
+                        <textarea class="form-control" id="editSectionDescription"
+                            asp-for="AddEditSection.Sectiondescription" placeholder="Enter Description"></textarea>
+                        <label asp-for="AddEditSection.Sectiondescription">Description</label>
+                        <span class="text-danger" asp-validation-for="AddEditSection.Sectiondescription"></span>
+                    </div>
+
+                    <div class="col mt-3 mb-3 d-flex justify-content-end">
+                        <button class="btn text-white me-2" style="background-color: #0066A7;"
+                            type="submit">Save</button>
+                        <button class="btn closeEditSection" style="border-color: #0066A7; color: #0066A7;" type="button"
+                           >Cancel</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Model Delete Section -->
+<div class="modal fade" id="deleteSectionModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
+    aria-labelledby="staticBackdropLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-body">
+                <div class="d-flex justify-content-center">
+                    <img src="~/images/toppng.com-warning-icon-2400x2400.png" alt="" style="width: 10%; height: 10%;">
+                </div>
+                <div class="d-flex justify-content-center mt-3">
+                    <span class="text-muted">Are you sure you want to delete this Section?</span>
+                </div>
+                <div class="d-flex justify-content-center mt-3">
+                    <button class="btn text-white" style="background-color: #0066A7;" type="button"
+                        id="confirmSectionDeleteBtn">Yes</button>
+                    <button class="btn ms-2" style="border-color: #0066A7; color: #0066A7;" type="button"
+                        data-bs-dismiss="modal">No</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.5/jquery.validate.min.js"></script>
+    <script
+        src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validation-unobtrusive/4.0.0/jquery.validate.unobtrusive.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"
+        integrity="sha512-VEd+nq25CkR676O+pLBnDW09R7VQX9Mdiij052gVCp5yVH3jGtH70Ho/UUv4mJDsEdTvqRCFZg0NKGiojGnUCw=="
+        crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+}
+
+
+<script>
+
+    @* -------------------------open add section model------------- *@
+        $(document).ready(function () {
+            // Open the modal
+            $(document).on('click', '.open-addsection-modal', function () {
+                var modal = new bootstrap.Modal(document.getElementById("addsection"));
+                modal.show();
+            });
+
+            // Close the modal
+            $(document).on('click', '.closeAddSection', function () {
+                var modal = bootstrap.Modal.getInstance(document.getElementById("addsection"));
+                modal.hide();
+            });
+
+        });
+
+    @* ---------------------Edit Section ----------------------- *@
+        function openSectionEditModal(sectionId) {
+            // Fetch data via AJAX
+            $.ajax({
+                url: '/SectionTables/EditSection/' + sectionId,
+                type: 'GET',
+                success: function (data) {
+                    if (data) {
+                        console.log("Fetched Data:", data);
+                        // Populate modal fields
+                        $('#editSectionId').val(data.sectionid);
+                        $('#editSectionName').val(data.sectionname);
+                        $('#editSectionDescription').val(data.sectiondescription);
+
+                        // Open the modal
+                        var modal = new bootstrap.Modal(document.getElementById("editsection"));
+                        modal.show();
+                    } else {
+                        toastr.error("No section data found.");
+                    }
+                },
+                error: function () {
+                    toastr.error("Failed to load section details.");
+                }
+            });
+        }
+
+        // Close the modal
+        $(document).ready(function () {
+            $(document).on('click', '.closeEditSection', function () {
+                var modal = bootstrap.Modal.getInstance(document.getElementById("editsection"));
+                modal.hide();
+            });
+        });
+       
+    @* ----------------------Delete Section--------------------------*@
+        function openSectionDeletModal(sectionId) {
+            console.log("Delete Section ID:", sectionId);
+            deleteSectionId = sectionId; // Save the section ID to a variable
+            var modal = new bootstrap.Modal(document.getElementById("deleteSectionModal"));
+            modal.show();
+        }
+
+    // Handle the confirmation of deletion
+    $(document).on('click', '#confirmSectionDeleteBtn', function () {
+        console.log("Deleting Section ID:", deleteSectionId);
+        if (deleteSectionId) {
+            $.ajax({
+                url: '@Url.Action("DeleteSection", "SectionTables")', // URL to the controller action
+                type: 'POST',
+                data: { sectionId: deleteSectionId }, // Pass the section ID to the server
+                success: function (response) {
+                  
+                    if (response.success) {
+                        toastr.success(response.message);
+                        location.reload(); // Reload the page to reflect changes
+                    } else {
+                        toastr.error(response.message);
+                    }
+                },
+                error: function () {
+                    toastr.error('An error occurred while deleting the section.');
+                    
+                }
+            });
+        } else {
+            toastr.error('Invalid section ID.');
+        }
+    });
+
+   
+
+    @* -----------------------Load Table on Section----------------------------- *@
+
+        function LoadPartialTableView(sectionId) {
+            console.log("Section ID:", sectionId);
+            var pageSize = $("#pageSizeDropdownTable").val();
+            console.log("Page Size:", pageSize);
+
+            $("#searchInputTable").val("");
+
+            // Show loading animation
+            @* $("#tableContainer").html("<p>Loading...</p>"); *@
+                $.ajax({
+                    url: '@Url.Action("GetTablesBySection", "SectionTables")',
+                    type: 'GET',
+                    data: { sectionId: sectionId, PageSize: pageSize },
+                    success: function (data) {
+                        $("#tableContainer").html(data);
+                    },
+                    error: function (error) {
+                        console.error('Error loading partial view:', error);
+                        $("#tableContainer").html("<p>Error loading items.</p>");
+                    }
+                });
+        }
+    function setActiveSection(element) {
+        console.log("Active");
+        // Remove the 'selected' class from all 
+        document.querySelectorAll('.category-inner-box').forEach(function (item) {
+            item.classList.remove('selected');
+        });
+        // Add the 'selected' class to the clicked 
+        element.classList.add('selected');
+    }
+    @* --------------------------------------------------------Delete And Mass Delete Table--------------------------------------------------------- *@
+        let deleteSectionId = null;
+        deleteTableIds = []; // Store selected item IDs
+    function openTableDeleteModal(tableId = null) {
+        deleteTableIds = []; // Reset array
+
+        if (tableId) {
+            console.log("Single delete");
+            deleteTableIds.push(tableId); // Single delete
+        } else {
+            console.log("Multiple delete");
+            $(".inner-checked-table:checked").each(function () {
+                deleteTableIds.push($(this).data("id")); // Fix selector
+            });
+        }
+        if (deleteTableIds.length > 0) {
+            console.log("Items to delete:", deleteTableIds);
+            var modal = new bootstrap.Modal(document.getElementById("tabledeleteModal"));
+            modal.show();
+
+        } else {
+            toastr.error("Please select at least one item to delete.");
+        }
+    }
+    // Fix mass delete button click event
+    function OpenmassDelete() {
+        openTableDeleteModal();
+    }
+    // Handle delete confirmation
+    $(document).on("click", "#tableconfirmDeleteBtn", function () {
+        console.log("Deleting Items:", deleteTableIds);
+        $.ajax({
+            url: '@Url.Action("DeleteTable", "SectionTables")',
+            type: 'POST',
+            data: { tableIds: deleteTableIds },
+            success: function (response) {
+                deleteTableIds = []; // Reset array
+                if (response.success) {
+                    var parentIdForTables= $("#parentIdForTables").val();
+                    LoadPartialTableView(parentIdForTables);
+                    var modal = bootstrap.Modal.getInstance(document.getElementById("tabledeleteModal"));
+                    modal.hide();
+                    toastr.success(response.message);
+                } else {
+                    toastr.error(response.message);
+                }
+            },
+            error: function (xhr, status, error) {
+                deleteTableIds = []; // Reset array
+                toastr.error('An error occurred while deleting the table.',error);
+            }
+        });
+    });
+
+</script>

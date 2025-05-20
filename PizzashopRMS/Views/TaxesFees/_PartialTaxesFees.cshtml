@@ -1,0 +1,93 @@
+@model DataAccessLayer.ViewModels.TaxesFeesViewModel
+
+
+<div class="row mt-3">
+    <div class="col">
+        <div class="table-responsive">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th scope="col">Name</th>
+                        <th scope="col">Type</th>
+                        <th scope="col">IsEnabled </th>
+                        <th scope="col">Default</th>
+                        <th scope="col">Tax Value</th>
+                        @if(ViewBag.Permissions[PermissionConst.CanAddEdit] || ViewBag.Permissions[PermissionConst.CanDelete])
+                        {
+                            <th scope="col">Action</th>
+                        }
+                    </tr>
+                </thead>
+                <tbody id="taxesTableBody">
+                    @foreach (var taxes in Model.TaxesViewModal)
+                    {
+                        <tr>
+
+                            <td>
+
+                                @taxes.Taxname
+                            </td>
+                            <td>
+                                @taxes.Taxtype
+                            </td>
+                            <td>
+                                <div class="form-check form-switch">
+                                    <input class="form-check-input" style="width: 2.5rem; height: 25px;" type="checkbox"
+                                        role="switch" @(taxes.Isenabled ?? false ? "checked" : "") disabled>
+                                </div>
+                            </td>
+                            <td>
+                                <div class="form-check form-switch">
+                                    <input class="form-check-input" style="width: 2.5rem; height: 25px;" type="checkbox"
+                                        role="switch" @(taxes.Isdefault ?? false ? "checked" : "") disabled>
+                                </div>
+                            </td>
+                            <td>
+                                @if (taxes.Taxtype == "Amount")
+                                {
+
+                                    <span>₹</span>
+                                }
+                                @taxes.Taxvalue
+                                @if (taxes.Taxtype == "Percentage")
+                                {
+
+                                    <span>%</span>
+                                }
+                            </td>
+                            @if(ViewBag.Permissions[PermissionConst.CanAddEdit] || ViewBag.Permissions[PermissionConst.CanDelete])
+                            {
+                                <td>
+                                    <div class="d-flex">
+                                    @if (ViewBag.Permissions[PermissionConst.CanAddEdit])
+                                    {
+                                        <a href="#" style="text-decoration: none; color: grey;"
+                                            onclick="openEditTaxModal(@taxes.TaxesId)">
+                                            <i class="bi bi-pen"></i>
+                                        </a>
+                                    }
+                                    @* else
+                                    {
+                                        <img src="~/images/pen-slash.svg" alt="" class="img-fluid" style="width: 16px; height: 16px;">
+                                    } *@
+                                    @if (ViewBag.Permissions[PermissionConst.CanDelete])
+                                    {
+                                        <a href="#" class="ms-4" style="text-decoration: none; color: grey;"
+                                            onclick="openDeleteTableModal(@taxes.TaxesId)">
+                                            <i class="bi bi-trash"></i>
+                                        </a>
+                                    }
+                                    @* else
+                                    {
+                                        <img src="~/images/trash-slash.svg" alt="" class="img-fluid" style="width: 16px; height: 16px;">
+                                    } *@
+                                    </div>
+                                </td>
+                            }
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

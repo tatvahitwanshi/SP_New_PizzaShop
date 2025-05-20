@@ -1,0 +1,22 @@
+
+.category-inner-box.selected  {
+    color: #0066A7 !important;
+    font-weight: bold;
+    /* color: white !important; */
+}
+.category-inner-box.selected img  {
+    filter: invert(27%) sepia(100%) saturate(500%) hue-rotate(160deg) brightness(90%) contrast(90%) !important;
+
+  
+}
+/* .category-inner-box:active{
+
+    color: #0066A7;
+    font-weight: bold;
+} */
+#tableAddForm .form-floating>label,#editTableForm .form-floating>label {
+    position: absolute;
+    top: 0;
+    left: 10px !important;
+    opacity: 0.65;
+}

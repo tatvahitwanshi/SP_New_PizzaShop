@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.5.0/font/bootstrap-icons.css" />
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
+        crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="~/css/sidebar.css">
+
+    <title>Document</title>
+</head>
+
+<body>
+    <div class=" sidebar d-none d-lg-flex flex-column   pt-4 ">
+
+        <a class="d-flex mb-3 justify-content-start align-items-center sidebar-inner-box @(ViewBag.Active == "Dashboard"? "active-sidebar" :" ")"
+            style="text-decoration: none;" asp-action="DashboardView" asp-controller="Dashboard">
+            <img src="~/images/sidebar icons/dashboard.png" alt=""
+                class="sidebar-icons ps-3 @(ViewBag.Active == "Dashboard" ? "active-icon" : " ")">
+            <div class="name-sidebar ps-3  @(ViewBag.Active == "Dashboard" ? "active-name" : " ")">Dashboard</div>
+        </a>
+        @if (ViewBag.Permissions[PermissionConst.USERS])
+        {
+            <a class="d-flex mb-3 justify-content-start align-items-center sidebar-inner-box @(ViewBag.Active == "UserList"? "active-sidebar" :" ")"
+                style="text-decoration: none;" asp-action="UserListView" asp-controller="UserList">
+                <img src="~/images/sidebar icons/users.png" alt=""
+                    class="sidebar-icons ps-3 @(ViewBag.Active == "UserList" ? "active-icon" : " ") ">
+                <div class="name-sidebar ps-3  @(ViewBag.Active == "UserList" ? "active-name" : " ")">Users</div>
+            </a>
+        }
+        @if (ViewBag.Permissions[PermissionConst.ROLEPERMISSION])
+        {
+            <a class="d-flex mb-3 justify-content-start align-items-center sidebar-inner-box @(ViewBag.Active == "RoleAndPermission"? "active-sidebar" :" ")"
+                style="text-decoration: none; " asp-action="RoleView" asp-controller="RolesAndPermission">
+                <img src="~/images/sidebar icons/roles_permission.png" alt=""
+                    class="sidebar-icons ps-3 @(ViewBag.Active == "RoleAndPermission" ? "active-icon" : " ")">
+                <div class="name-sidebar ps-3  @(ViewBag.Active == "RoleAndPermission" ? "active-name" : " ")">Role and
+                    Permission</div>
+            </a>
+        }
+        @if (ViewBag.Permissions[PermissionConst.MENU])
+        {
+            <a class="d-flex mb-3 justify-content-start align-items-center sidebar-inner-box @(ViewBag.Active == "Menu"? "active-sidebar" :" ")"
+                style="text-decoration: none;" asp-action="MenuView" asp-controller="Menu">
+                <img src="~/images/sidebar icons/menu.png" alt=""
+                    class="sidebar-icons ps-3 @(ViewBag.Active == "Menu" ? "active-icon" : " ")">
+                <div class="name-sidebar ps-3 @(ViewBag.Active == "Menu" ? "active-name" : " ") ">Menu</div>
+            </a>
+        }
+        @if (ViewBag.Permissions[PermissionConst.TABLESECTION])
+        {
+            <a class="d-flex mb-3 justify-content-start align-items-center sidebar-inner-box @(ViewBag.Active == "SectionTables"? "active-sidebar" :" ")"
+                style="text-decoration: none;" asp-action="SectionTablesView" asp-controller="SectionTables">
+                <img src="~/images/sidebar icons/tables.svg" alt=""
+                    class="sidebar-icons ps-3 @(ViewBag.Active == "SectionTables" ? "active-icon" : " ")">
+                <div class="name-sidebar ps-3  @(ViewBag.Active == "SectionTables" ? "active-name" : " ")">Table and Section
+                </div>
+            </a>
+        }
+        @if (ViewBag.Permissions[PermissionConst.TAXFEES])
+        {
+            <a class="d-flex mb-3  justify-content-start align-items-center sidebar-inner-box  @(ViewBag.Active == "TaxesFees"? "active-sidebar" :" ")"
+                style="text-decoration: none;" asp-action="TaxesFeesView" asp-controller="TaxesFees">
+                <img src="~/images/sidebar icons/taxes.svg" alt=""
+                    class="sidebar-icons ps-3 @(ViewBag.Active == "TaxesFees" ? "active-icon" : " ")">
+                <div class="name-sidebar ps-3 @(ViewBag.Active == "TaxesFees" ? "active-name" : " ")">Taxes and Fees</div>
+            </a>
+        }
+        @if (ViewBag.Permissions[PermissionConst.ORDERS])
+        {
+            <a class="d-flex mb-3 justify-content-start align-items-center sidebar-inner-box @(ViewBag.Active == "Orders"? "active-sidebar" :" ")"
+                style="text-decoration: none;" asp-action="OrdersView" asp-controller="Orders">
+                <img src="~/images/sidebar icons/orders.svg" alt=""
+                    class="sidebar-icons ps-3 @(ViewBag.Active == "Orders" ? "active-icon" : " ")">
+                <div class="name-sidebar ps-3 @(ViewBag.Active == "Orders" ? "active-name" : " ")">Orders</div>
+            </a>
+        }
+        @if (ViewBag.Permissions[PermissionConst.CUSTOMERS])
+        {
+            <a class="d-flex mb-3 justify-content-start align-items-center sidebar-inner-box  @(ViewBag.Active == "Customers"? "active-sidebar" :" ")"
+                style="text-decoration: none;" asp-action="CustomersView" asp-controller="Customers">
+                <img src="~/images/sidebar icons/customers.svg" alt=""
+                    class="sidebar-icons ps-3 @(ViewBag.Active == "Customers" ? "active-icon" : " ")">
+                <div class="name-sidebar ps-3 @(ViewBag.Active == "Customers" ? "active-name" : " ")">Customers</div>
+            </a>
+        }
+    </div>
+
+    <!-- Responsive sidebar -->
+    <div class="sidebaroffcanvas offcanvas offcanvas-start d-lg-none" tabindex="-1" id="offcanvasExample"
+        aria-labelledby="offcanvasExampleLabel" style="width: auto; padding: 2%;" data-bs-scroll="true"
+        data-bs-backdrop="false">
+        <div class="offcanvas-header">
+            <img src="~/images/logos/pizzashop_logo.png" alt="company-logo" id="company-logo-img">
+            <div class="h5 " id="company-name" style="color: #0066A7;">PIZZASHOP</div>
+            <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"
+                style="margin-bottom: inherit;"></button>
+        </div>
+        <div class="sidebar ps-4 mt-3">
+            <a class="d-flex mb-3 justify-content-start align-items-center sidebar-inner-box @(ViewBag.Active == "Dashboard"? "active-sidebar" :" ")"
+                style="text-decoration: none;" asp-action="DashboardView" asp-controller="Dashboard">
+                <img src="~/images/sidebar icons/dashboard.png" alt=""
+                    class="sidebar-icons ps-3 @(ViewBag.Active == "Dashboard" ? "active-icon" : " ")">
+                <div class="name-sidebar ps-3  @(ViewBag.Active == "Dashboard" ? "active-name" : " ")">Dashboard</div>
+            </a>
+            @if (ViewBag.Permissions[PermissionConst.USERS])
+            {
+                <a class="d-flex mb-3 justify-content-start align-items-center sidebar-inner-box @(ViewBag.Active == "UserList"? "active-sidebar" :" ")"
+                    style="text-decoration: none;" asp-action="UserListView" asp-controller="UserList">
+                    <img src="~/images/sidebar icons/users.png" alt=""
+                        class="sidebar-icons ps-3 @(ViewBag.Active == "UserList" ? "active-icon" : " ") ">
+                    <div class="name-sidebar ps-3  @(ViewBag.Active == "UserList" ? "active-name" : " ")">Users</div>
+                </a>
+            }
+            @if (ViewBag.Permissions[PermissionConst.ROLEPERMISSION])
+            {
+                <a class="d-flex mb-3 justify-content-start align-items-center sidebar-inner-box @(ViewBag.Active == "RoleAndPermission"? "active-sidebar" :" ")"
+                    style="text-decoration: none; " asp-action="RoleView" asp-controller="RolesAndPermission">
+                    <img src="~/images/sidebar icons/roles_permission.png" alt=""
+                        class="sidebar-icons ps-3 @(ViewBag.Active == "RoleAndPermission" ? "active-icon" : " ")">
+                    <div class="name-sidebar ps-3  @(ViewBag.Active == "RoleAndPermission" ? "active-name" : " ")">Role and
+                        Permission</div>
+                </a>
+            }
+            @if (ViewBag.Permissions[PermissionConst.MENU])
+            {
+                <a class="d-flex mb-3 justify-content-start align-items-center sidebar-inner-box @(ViewBag.Active == "Menu"? "active-sidebar" :" ")"
+                    style="text-decoration: none;" asp-action="MenuView" asp-controller="Menu">
+                    <img src="~/images/sidebar icons/menu.png" alt=""
+                        class="sidebar-icons ps-3 @(ViewBag.Active == "Menu" ? "active-icon" : " ")">
+                    <div class="name-sidebar ps-3 @(ViewBag.Active == "Menu" ? "active-name" : " ") ">Menu</div>
+                </a>
+            }
+            @if (ViewBag.Permissions[PermissionConst.TABLESECTION])
+            {
+                <a class="d-flex mb-3 justify-content-start align-items-center sidebar-inner-box @(ViewBag.Active == "SectionTables"? "active-sidebar" :" ")"
+                    style="text-decoration: none;" asp-action="SectionTablesView" asp-controller="SectionTables">
+                    <img src="~/images/sidebar icons/tables.svg" alt=""
+                        class="sidebar-icons ps-3 @(ViewBag.Active == "SectionTables" ? "active-icon" : " ")">
+                    <div class="name-sidebar ps-3  @(ViewBag.Active == "SectionTables" ? "active-name" : " ")">Table and
+                        Section</div>
+                </a>
+            }
+            @if (ViewBag.Permissions[PermissionConst.TAXFEES])
+            {
+                <a class="d-flex mb-3  justify-content-start align-items-center sidebar-inner-box  @(ViewBag.Active == "TaxesFees"? "active-sidebar" :" ")"
+                    style="text-decoration: none;" asp-action="TaxesFeesView" asp-controller="TaxesFees">
+                    <img src="~/images/sidebar icons/taxes.svg" alt=""
+                        class="sidebar-icons ps-3 @(ViewBag.Active == "TaxesFees" ? "active-icon" : " ")">
+                    <div class="name-sidebar ps-3 @(ViewBag.Active == "TaxesFees" ? "active-name" : " ")">Taxes and Fees
+                    </div>
+                </a>
+            }
+            @if (ViewBag.Permissions[PermissionConst.ORDERS])
+            {
+                <a class="d-flex mb-3 justify-content-start align-items-center sidebar-inner-box @(ViewBag.Active == "Orders"? "active-sidebar" :" ")"
+                    style="text-decoration: none;" asp-action="OrdersView" asp-controller="Orders">
+                    <img src="~/images/sidebar icons/orders.svg" alt=""
+                        class="sidebar-icons ps-3 @(ViewBag.Active == "Orders" ? "active-icon" : " ")">
+                    <div class="name-sidebar ps-3 @(ViewBag.Active == "Orders" ? "active-name" : " ")">Orders</div>
+                </a>
+            }
+            @if (ViewBag.Permissions[PermissionConst.CUSTOMERS])
+            {
+                <a class="d-flex mb-3 justify-content-start align-items-center sidebar-inner-box  @(ViewBag.Active == "Customers"? "active-sidebar" :" ")"
+                    style="text-decoration: none;" asp-action="CustomersView" asp-controller="Customers">
+                    <img src="~/images/sidebar icons/customers.svg" alt=""
+                        class="sidebar-icons ps-3 @(ViewBag.Active == "Customers" ? "active-icon" : " ")">
+                    <div class="name-sidebar ps-3 @(ViewBag.Active == "Customers" ? "active-name" : " ")">Customers</div>
+                </a>
+            }
+        </div>
+    </div>
+
+
+</body>
+
+</html>

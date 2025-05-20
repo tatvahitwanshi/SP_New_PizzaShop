@@ -1,0 +1,314 @@
+@model DataAccessLayer.ViewModels.MenuViewModel
+<input type="text" id="ModifierGroupIdForSearch" asp-for="@Model.ModifierItemViewModel.ParentId" hidden>
+
+<div class="row mt-3">
+    <div class="col">
+        @if( Model.ModifierItemViewModel.List != null &&  Model.ModifierItemViewModel.List.Any())
+        {
+            <div class="table-responsive">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th scope="col"><input class="form-check-input main-check-modifier" type="checkbox" value=""
+                                    id="selectAllCheckbox"></th>
+                            <th scope="col">Name</th>
+                            <th scope="col">Unit</th>
+                            <th scope="col">Rate </th>
+                            <th scope="col">Quantity</th>
+                            @if(ViewBag.Permissions[PermissionConst.CanAddEdit] || ViewBag.Permissions[PermissionConst.CanDelete])
+                            {
+                                <th scope="col">Action</th>
+                            }
+                        </tr>
+                    </thead>
+                    <tbody id="itemsTableBody">
+                        @foreach (var item in Model.ModifierItemViewModel.List)
+                        {
+                            <tr>
+                                <td>
+                                    <input class="form-check-input inner-check-modifier" type="checkbox" data-id="@item.ModifierItemId">
+                                </td>
+                                <td>
+                                    @item.ModifierItemName
+                                </td>
+                                <td>@item.ModifierUnitname</td>
+                                <td>@item.Rate</td>
+                                <td>@item.Quantity</td>
+                                @if(ViewBag.Permissions[PermissionConst.CanAddEdit] || ViewBag.Permissions[PermissionConst.CanDelete])
+                                {
+                                    <td>
+                                        <div class="d-flex">
+                                            @if (ViewBag.Permissions[PermissionConst.CanAddEdit])
+                                            {
+                                                <a  style="text-decoration: none; color: grey;"
+                                                    onclick="GetModifiersItemDetail(@item.ModifierItemId)">
+                                                    <i class="bi bi-pen"></i>
+                                                </a>
+                                            }
+                                            @if (ViewBag.Permissions[PermissionConst.CanDelete])
+                                            {
+                                                <a href="#" class="ms-4" style="text-decoration: none; color: grey;"
+                                                    onclick="openModifierItemDeleteModal(@item.ModifierItemId)"
+                                                    ><i class="bi bi-trash"></i></a>
+                                            }
+                                        </div>
+                                    </td>
+                                }
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+            <div class="main-pagination ">
+                <div class="item-show ">
+                    <nav aria-label="Page navigation example">
+                        <div class="pagination ">
+                            <span class="align-self-center">Items Per Page
+                                :</span>
+                            <select class="form-select form-select-sm ms-2 align-self-center"
+                                aria-label="Small select example" style=" width: unset; " id="pageSizeDropdownModifier"
+                                onchange="updatePagePerSizeForModifier(@Model.ModifierItemViewModel.ParentId)">
+                                @if (Model.ModifierItemViewModel?.PageSize != null)
+                                {
+                                    @* <option value="1" selected="@(Model.ModifierItemViewModel.PageSize == 1 ? true : false)">1
+                                    </option>
+                                    <option value="3" selected="@(Model.ModifierItemViewModel.PageSize == 3 ? true : false)">3
+                                    </option> *@
+                                    <option value="5" selected="@(Model.ModifierItemViewModel.PageSize == 5 ? true : false)">5
+                                    </option>
+                                    <option value="10" selected="@(Model.ModifierItemViewModel.PageSize == 10 ? true : false)">
+                                        10</option>
+                                    <option value="25" selected="@(Model.ModifierItemViewModel.PageSize == 25 ? true : false)">
+                                        25</option>
+                                }
+                            </select>
+
+                        </div>
+                    </nav>
+                </div>
+                <div class="showing-page">
+                    <nav aria-label="Page navigation example">
+                        <div class="pagination ">
+                            <span class=" ms-2  align-self-center">Showing
+                                @{
+                                    var startRecord = (Model.ModifierItemViewModel.PageNumber - 1) *
+                                    Model.ModifierItemViewModel.PageSize + 1;
+                                    var endRecord = Model.ModifierItemViewModel.PageNumber *
+                                    Model.ModifierItemViewModel.PageSize;
+                                    if (endRecord > Model.ModifierItemViewModel.Count)
+                                        endRecord = Model.ModifierItemViewModel.Count;
+
+                                    if (Model.ModifierItemViewModel.Count == 0)
+                                    {
+                                        startRecord = 0;
+                                        endRecord = 0;
+                                    }
+                                }
+                                <span style="color: green;" class="me-1">@startRecord - @endRecord</span> of <span
+                                    style="color: red;" class="ms-1">@Model.ModifierItemViewModel.Count</span>
+                            </span>
+                            <button class="btn border ms-2  align-self-center @(Model.ModifierItemViewModel.PageNumber == 1 ? "disabled" : "")" type="submit"
+                                onclick="PanginationBtnModifier(@Model.ModifierItemViewModel.PageNumber-1,@Model.ModifierItemViewModel.ParentId)"><i class="bi bi-chevron-left "></i>
+                            </button>
+                            <button class="btn border ms-2  align-self-center  @((Model.ModifierItemViewModel.PageNumber * Model.ModifierItemViewModel.PageSize >= Model.ModifierItemViewModel.Count) ? "disabled" : "")" type="submit"
+                                onclick="PanginationBtnModifier(@Model.ModifierItemViewModel.PageNumber+1,@Model.ModifierItemViewModel.ParentId)"><i class="bi bi-chevron-right"></i>
+                            </button>
+                        </div>
+                    </nav>
+                </div>
+
+
+            </div>
+        }
+        else
+        {
+            <span style="color: #0066A7; font-weight: 600; display:flex; justify-content: center;">No Modifier Found</span>
+        }
+      
+    </div>
+</div>
+
+
+@* Add Modidfier Item  *@
+<div class="modal fade" id="addModifieritemModal" tabindex="-1" data-bs-backdrop="static" data-bs-keyboard="false"
+    aria-labelledby="staticBackdropLabel" aria-hidden=" true">
+    <div class="modal-dialog modal-dialog-centered modal-xl"  style="width:95% !important">
+        <div class="modal-content p-4">
+            <div class="d-flex justify-content-between">
+                <h5 class="modal-title">Add Modifier</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form   method="post" id="addModifierItemForm">
+            <input type="hidden" id="modifierGroupIdsInput" name="AddEditModItem.ModifierGroupIds" />
+                
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <div class="dropdown w-100 h-100 border">
+                            <div class="btn dropdown-toggle w-100 d-flex justify-content-between align-items-center "
+                                type="button" data-bs-toggle="dropdown" style="border: none !important;">
+                                Select Modifier Options
+                            </div>
+                            <div id="addselectedItemsContainer" class="d-flex  flex-wrap p-2 ">
+                                <!-- Selected items will be displayed here -->
+                            </div>
+                            <ul class="dropdown-menu p-2" style="max-height: 200px; overflow-y: auto; "
+                                aria-labelledby="multiSelectDropdown">
+                                @foreach (var modgroup in Model.ModifierGroupModel)
+                                    {
+                                        <li>
+                                            <label class="dropdown-item">
+                                                <input type="checkbox" value="@modgroup.ModifierGroupId" class="me-2"
+                                                    name="addmodgroupCheckbox"> @modgroup.ModifierGroupName
+                                            </label>
+                                        </li>
+                                    }
+                            </ul>
+                        </div>
+
+                    </div>
+                    
+                    <div class="col-md-6">
+                        <div class="form-floating">
+                            <input type="text" class="form-control" asp-for="@Model.AddEditModItem.ModifierItemName" id="addModifieritemname" placeholder="Name" >
+                            <label for="addModifieritemname">Name</label>
+                            <span asp-validation-for="@Model.AddEditModItem.ModifierItemName" class="text-danger"></span>
+                        </div>
+                    </div>
+
+                    <div class="col-md-4">
+                        <div class="form-floating">
+                            <input type="number" class="form-control" asp-for="@Model.AddEditModItem.Rate" id="addModifieritemrate" placeholder="Rate">
+                            <label for="addModifieritemrate">Rate</label>
+                            <span asp-validation-for="@Model.AddEditModItem.Rate" class="text-danger"></span>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-floating">
+                            <input type="number" class="form-control" asp-for="@Model.AddEditModItem.Quantity" id="addModifieritemquantity" placeholder="Quantity">
+                            <label for="addModifieritemquantity">Quantity*</label>
+                            <span asp-validation-for="@Model.AddEditModItem.Quantity" class="text-danger"></span>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-floating">
+                            <select class="form-select" id="addModifieritemunit" asp-for="@Model.AddEditModItem.Modifiersunit">
+                                <@foreach (var itemsUnit in Model.ItemsUnit)
+                                {
+                                    <option value="@itemsUnit.Unitid">@itemsUnit.Unitname</option>
+                                }
+                            </select>
+                            <label for="addModifieritemunit">Unit*</label>
+                        </div>
+                    </div>
+                    <div class="col-md-12">
+                        <div class="form-floating">
+                            <textarea class="form-control" asp-for="@Model.AddEditModItem.ModifierItemDescription" id="addModifieritemdescription" placeholder="Description"
+                                style="height: 80px;"></textarea>
+                            <label for="addModifieritemdescription">Description</label>
+                            <span asp-validation-for="@Model.AddEditModItem.ModifierItemDescription" class="text-danger"></span>
+                        </div>
+                    </div>
+                </div>
+                <div class="d-flex justify-content-end mt-3">
+                    <button type="submit" class="btn text-white" style="background-color: #0066A7;">Save</button>
+                    <button type="button" class="btn ms-2"
+                        style="border-color: #0066A7; color: #0066A7; text-decoration: none;"
+                        data-bs-dismiss="modal">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@* Edit Modifier Items *@
+<div class="modal " id="editModifieritemModal" tabindex="-1" data-bs-backdrop="static" data-bs-keyboard="false"
+    aria-labelledby="staticBackdropLabel" aria-hidden=" true">
+    <div class="modal-dialog modal-dialog-centered modal-xl"  style="width:95% !important">
+        <div class="modal-content p-4">
+            <partial name="_EditModifierItemModal.cshtml"></partial>
+        </div>
+    </div>
+</div>
+
+@* Delete Item Model *@
+<div class="modal fade" id="modifieritemdeleteModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
+    aria-labelledby="staticBackdropLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-body">
+                <input type="text" value="@Model.ModifierItemViewModel.ParentId" id="parentIdmodifier" name="ParentId" hidden>
+                <div class="d-flex justify-content-center">
+                    <img src="~/images/toppng.com-warning-icon-2400x2400.png" alt="" style="width: 10%; height: 10%;">
+                </div>
+                <div class="d-flex justify-content-center mt-3">
+                    <span class="text-muted">Are you sure you want to delete this Item?</span>
+                </div>
+                <div class="d-flex justify-content-center mt-3">
+                    <button class="btn text-white" style="background-color: #0066A7;" type="button"
+                        id="modifieritemconfirmDeleteBtn">Yes</button>
+                    <button class="btn ms-2" style="border-color: #0066A7; color: #0066A7;" type="button"
+                        data-bs-dismiss="modal">No</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js" integrity="sha512-VEd+nq25CkR676O+pLBnDW09R7VQX9Mdiij052gVCp5yVH3jGtH70Ho/UUv4mJDsEdTvqRCFZg0NKGiojGnUCw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css" rel="stylesheet" />
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+
+<script src="~/lib/jquery-validation/dist/jquery.validate.min.js"></script>
+<script src="~/lib/jquery-validation/dist/additional-methods.min.js"></script>
+<script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.min.js"></script>
+
+@section Scripts{
+    <partial name="_ValidationScriptsPartial" />
+}
+
+<script>
+
+@* -----------------------------add modifierg Item--------------------------------- *@
+
+
+        // Track selected modifier group IDs
+         @* ---this code is in outer partial view (_PartialViewModifier)--- *@
+
+        // Handle checkbox change event
+        @* ---this code is in outer partial view (_PartialViewModifier)--- *@
+
+        // Clear selected items when modal is closed
+        $("#addModifieritemModal").on("hidden.bs.modal", function () {
+            $("#addselectedItemsContainer").empty(); // Clear UI badges
+            $("input[name='addmodgroupCheckbox']").prop("checked", false); // Uncheck all checkboxes
+            selectedModifierIds = []; // Reset selected list
+            $("#modifierGroupIdsInput").val(""); // Clear hidden input
+        });
+
+        
+ 
+@* -----------------------checkbox for delete----------------- *@
+    $(document).ready(function () {
+            // Handle main checkbox click
+            $('.main-check-modifier').on('click', function () {
+                var isChecked = $(this).is(':checked');
+                $('.inner-check-modifier').prop('checked', isChecked);
+            });
+
+            // Handle individual checkbox clicks
+            $(document).on('click', '.inner-check-modifier', function () {
+                if (!$(this).is(':checked')) {
+                    // Uncheck main checkbox if one inner checkbox is unchecked
+                    $('.main-check-modifier').prop('checked', false);
+                } else {
+                    // Check if all inner checkboxes are checked
+                    var allChecked = $('.inner-check-modifier').length === $('.inner-check-modifier:checked').length;
+                    $('.main-check-modifier').prop('checked', allChecked);
+                }
+            });
+        });
+</script>

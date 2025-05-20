@@ -1,0 +1,110 @@
+@* /*---------------------------------- heading Line --------------------------*/ *@
+<input type="hidden" value="@Model.CurrentCategory" id="currentCategoryInputId">
+<div class="row d-flex justify-content-between align-items-center px-0 mb-2 mt-1">
+
+    <div class=" col-sm-2 col-xs-12 special-color fs-3 fw-bold">
+        @Model.CategoryName
+    </div>
+
+    <div class="col-sm-10 col-sxs-12 d-flex gap-2 justify-content-end align-items-center">
+        <input type="hidden" id="orderStatusField" value="@Model.OrderStatus">
+        <div class="inprogress-ready-btn @(Model.OrderStatus == "In Progress" ? "active-btn" : "")"
+            onclick="GetTabContent(@Model.CurrentCategory, 'In Progress')">
+            In Progress
+        </div>
+        <div class="inprogress-ready-btn @(Model.OrderStatus == "Ready" ? "active-btn" : "")"
+            onclick="GetTabContent(@Model.CurrentCategory, 'Ready')">
+            Ready
+        </div>
+        <button class="btn light-btn next-back-btn" id="nextBtn" onclick="changePage('back')">
+            < 
+        </button>
+        <button class="btn light-btn next-back-btn" id="backBtn" onclick="changePage('next')">
+            >
+        </button>
+    </div>
+</div>
+
+<div class="KOT-Card-List-Container">
+    <div class="card-wrapper d-flex gap-3" id="cardWrapper">
+
+        @foreach (var card in Model.Cards)
+        {
+            @* /*---------------------------- Kot Cards --------------------------*/ *@
+            <div class="d-flex flex-column KOT-Card mb-4">
+
+                @* /*--------------- Header ------------*/ *@
+                <div class="d-flex flex-column Card-Header justify-content-between">
+                    <div class="d-flex justify-content-between">
+                        <span class="special-color fw-bold">
+                            # @card.OrderId
+                        </span>
+                        <span class="text-secondary d-flex align-items-center order-time"
+                            data-time="@card.OrderTime.ToString("yyyy-MM-ddTHH:mm:ss")">
+                            <i class="bi bi-stopwatch me-1"></i>
+                            <span class="time-difference">Calculating...</span>
+                        </span>
+
+                    </div>
+                    <div class="d-flex justify-content-start align-items-center fw-bold">
+                        <span class="special-color">
+                            @card.SectionName
+                        </span>
+                        <i class="bi bi-dot"></i>
+                        @for (int i = 0; i < card.TableNameList.Count; i++)
+                        {
+                            <span class="opacity-75">
+                                @card.TableNameList[i]
+                            </span>
+
+                            @if (i == card.TableNameList.Count - 1)
+                                continue;
+
+                            <i class="bi bi-dot"></i>
+                        }
+
+                    </div>
+                </div>
+
+                @* /*--------------- Item List ------------*/ *@
+
+                <div class="d-flex flex-column Card-Content"  onclick='OpenchangeQuantityModal(@Html.Raw(Json.Serialize(card)), "@Model.OrderStatus", @Model.CurrentCategory)'>
+
+                    @foreach (var item in card.ItemList)
+                    {
+                        <div class="d-flex flex-column">
+                            <div class="d-flex justify-content-between fw-bold">
+                                <div>@item.ItemName</div>
+                                <div>@item.Quantity</div>
+                            </div>
+                           
+                            <ul>
+                                @foreach (var modifier in item.ModifiersList)
+                                {
+                                    <li>@modifier.ModifierName</li>
+                                }
+                                @if(item.ItemInstructions != null && item.ItemInstructions != "")
+                                {
+                                    <span class="special-color fw-bold">Instruction :</span>@item.ItemInstructions
+                                }
+                            </ul>
+
+                        </div>
+                    }
+                </div>
+
+
+                @* /*--------------- Fooder ------------*/ *@
+                <div class="Card-Footer flex-wrap">
+                    <span class="special-color fw-bold">Order Instruction :</span> @card.OrderInstructions
+                </div>
+            </div>
+
+        }
+
+    </div>
+
+</div>
+
+
+

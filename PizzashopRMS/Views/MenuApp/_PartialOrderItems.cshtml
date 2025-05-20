@@ -1,0 +1,61 @@
+@model DataAccessLayer.ViewModels.OrderedItem;
+<tr class="text-nowrap item-row acc-item" id="item-row-@Model.Id" onclick="giveInstruction(@Model.Id)">
+    <td >
+        <div class="accordion" id="item-accordian-@Model.Id">
+            <div class="d-flex align-items-center gap-2 drop-class" data-bs-toggle="collapse"
+                data-bs-target="#order-item-@Model.Id" aria-expanded="true" aria-controls="order-item-@Model.Id" onclick="event.stopPropagation()">
+                <div class="icon-rotate opacity-50">
+                    <i class="bi bi-chevron-down"></i>
+                </div>
+                 <span class="fw-bold text-dark item-name-for-order">@Model.ItemName</span>
+            </div>
+            <div id="order-item-@Model.Id" class="accordion-collapse collapse show"
+                data-bs-parent="#item-accordian-@Model.Id">
+                <div class="accordion-body">
+                    <ul id="modifier-list-for-order-@Model.Id" class="modifier-list-for-order ps-4 mb-0 mt-1" style="min-width: 90px; max-width: 200px;">
+                        @if (Model.ModifierList != null)
+                        {
+                            @foreach (var modifier in Model.ModifierList)
+                            {
+                                <li>
+                                    <div class="d-flex justify-content-between gap-2">
+                                        <span>@modifier.ModifierName @modifier.ModifierGroupName</span>
+                                        <span>₹@modifier.Price</span>
+                                    </div>
+                                </li>
+                            }
+                        }
+                        @if (Model.Instruction != null && Model.Instruction != "")
+                        {
+                            <li class="mt-2 item-instruction ">
+                                <span class="special-color fw-bold me-1">Instruction: </span>
+                                <span  class="instruction-detail  text-break " style="word-break: break-word; white-space: pre-wrap;">@Model.Instruction</span>
+                            </li>
+                        }
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </td>
+    <td class="text-center align-middle">
+        <div style="width: 100px; height: 40px"
+            class="count border border-secondary d-flex justify-content-between align-items-center px-2 rounded quantity-box">
+            <i class="bi bi-dash" onclick="event.stopPropagation(); changeQuantityItem(this, 'dec', @Model.Id)"></i>
+            <span class="value quantity-box-display">@Model.Quantity</span>
+            <i class="bi bi-plus" onclick="event.stopPropagation(); changeQuantityItem(this, 'inc', @Model.Id)" id="new-add-quantity-@Model.Id"></i>
+        </div>
+    </td>
+    <td class="text-center align-middle">
+        <div class="d-flex flex-column item-sums">
+            <span class="fs-5 text-dark item-amount" data-amount="@Model.ItemPriceTotal">₹@(Model.ItemPriceTotal * Model.Quantity)</span>
+            <span class="text-secondary fs-6 modifier-amount"
+                data-amount="@Model.ModifierPriceTotal">₹@(Model.ModifierPriceTotal* Model.Quantity)</span>
+        </div>
+    </td>
+    <td class="text-center align-middle">
+        @if(Model.ReadyQuantity + Model.ServedQuantity == 0)
+        {
+            <i class="bi bi-trash fs-5" onclick="event.stopPropagation(); deleteItemFromOrder(@Model.Id)"></i>
+        }
+    </td>
+</tr>
