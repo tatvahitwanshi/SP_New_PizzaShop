@@ -124,7 +124,6 @@ public class KotRepository : IKot
             new { current_category = CurrentCategory, order_status = orderStatus }
         ).ToList();
 
-
         foreach (int orderid in matchedOrderIds)
         {
             OrderCards oneOrder = new OrderCards();
@@ -138,9 +137,9 @@ public class KotRepository : IKot
             oneOrder.ItemList = GetItemList(orderid, CurrentCategory, orderStatus, connection);
             result.Add(oneOrder);
         }
-
         return result;
     }
+
     public (string sectionName, List<string> tableList) GetSectionAndTables(int orderId, DbConnection conn)
     {
 
@@ -154,6 +153,7 @@ public class KotRepository : IKot
 
         return (sectionName, tableList);
     }
+
     public List<SingleItem> GetItemList(int orderId, int currentCategory, string orderStatus, DbConnection conn)
     {
         var items = conn.Query<SingleItem>(
@@ -168,7 +168,6 @@ public class KotRepository : IKot
                 new { dish_id = item.DishId }
             ).ToList();
         }
-
         return items;
     }
 

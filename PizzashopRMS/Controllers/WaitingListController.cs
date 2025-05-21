@@ -1,6 +1,7 @@
 using BusinessLayer.Interface;
 using DataAccessLayer.ViewModels;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.SignalR;
 using PizzashopRMS.Helpers;
 
 namespace PizzashopRMS.Controllers;
@@ -10,11 +11,16 @@ public class WaitingListController : BaseOrderAppController
 {
     public readonly IWaitingList _waitingList;
     private readonly ILogger<WaitingListController> _logger;
+    private readonly IHubContext<HubSignalR> _hubContext;
+    private readonly IDashboard _dashboard;
 
-    public WaitingListController(IWaitingList waitingList,ILogger<WaitingListController> logger)
+
+    public WaitingListController(IWaitingList waitingList, ILogger<WaitingListController> logger, IHubContext<HubSignalR> hubContext, IDashboard dashboard)
     {
         _waitingList = waitingList;
-        _logger=logger;
+        _logger = logger;
+        _hubContext = hubContext;
+        _dashboard = dashboard;
     }
 
     public async Task<IActionResult> WaitingList()
@@ -88,7 +94,6 @@ public class WaitingListController : BaseOrderAppController
     }
 
     [HttpPost]
-
     public async Task<IActionResult> GenerateToken(WaitingToken token)
     {
         token.By = getUserEmail();
@@ -100,6 +105,11 @@ public class WaitingListController : BaseOrderAppController
             {
                 await _waitingList.generateToken(token);
                 message = "Token generated successfully";
+
+                var startDate = new DateTime(DateTime.Now.Year, DateTime.Now.Month, 1);
+                var endDate = DateTime.Now;
+                int updatedCount = await _dashboard.GetWaitingListCount(startDate, endDate);
+                await _hubContext.Clients.All.SendAsync("WaitingListAuto", updatedCount);
                 return Json(new { success = true, message = message });
             }
             catch (InvalidOperationException ex)
@@ -146,8 +156,11 @@ public class WaitingListController : BaseOrderAppController
             if (tokenId > 0)
             {
                 await _waitingList.deleteToken(tokenId);
+                var startDate = new DateTime(DateTime.Now.Year, DateTime.Now.Month, 1);
+                var endDate = DateTime.Now;
+                int updatedCount = await _dashboard.GetWaitingListCount(startDate, endDate);
+                await _hubContext.Clients.All.SendAsync("WaitingListAuto", updatedCount);
                 return Json(new { success = true, message = "Waiting token deleted successfully" });
-                
             }
             return Json(new { success = false, message = "Invalid token ID." });
         }

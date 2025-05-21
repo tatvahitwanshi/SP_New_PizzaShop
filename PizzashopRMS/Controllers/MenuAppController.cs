@@ -1,7 +1,9 @@
 using System.Threading.Tasks;
 using BusinessLayer.Interface;
+using DataAccessLayer.Constants;
 using DataAccessLayer.ViewModels;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.SignalR;
 using Newtonsoft.Json;
 using PizzashopRMS.Helpers;
 
@@ -12,13 +14,17 @@ public class MenuAppController : BaseOrderAppController
     private readonly IMenuApp _menuApp;
     private readonly IOrders _orders;
     private readonly ILogger<MenuAppController> _logger;
+    private readonly IHubContext<HubSignalR> _hubContext;
+    private readonly IDashboard _dashboard;
 
 
-    public MenuAppController(IMenuApp menuApp , IOrders orders,ILogger<MenuAppController> logger)
+    public MenuAppController(IMenuApp menuApp, IOrders orders, ILogger<MenuAppController> logger, IHubContext<HubSignalR> hubContext, IDashboard dashboard)
     {
         _menuApp = menuApp;
-        _orders= orders;
-        _logger=logger;
+        _orders = orders;
+        _logger = logger;
+        _dashboard = dashboard;
+        _hubContext = hubContext;
     }
 
     public async Task<IActionResult> MenuApp(int tableId = -1)
@@ -234,6 +240,18 @@ public class MenuAppController : BaseOrderAppController
             {
                 TempData["success"] = "Order Completed Successfully";
             }
+            var dashboard = await _dashboard.GetDashboardData(DashboardConst.CURRENT_MONTH, "", "");
+            int updatedCount = dashboard.DashboardData!.TotalOrder;
+            await _hubContext.Clients.All.SendAsync("TotalOrderAuto", updatedCount);
+            int updatedSalesCount = dashboard.DashboardData!.TotalSales;
+            await _hubContext.Clients.All.SendAsync("TotalSalesAuto", updatedSalesCount);
+            int updateAvgOrderCount = dashboard.DashboardData.AvgOrderValue;
+            await _hubContext.Clients.All.SendAsync("AvgOrderAuto", updateAvgOrderCount);
+            double? updateAvgWaitingTime = dashboard.DashboardData.AvgWaitingTime;
+            await _hubContext.Clients.All.SendAsync("AvgWaitingTimeAuto", updateAvgOrderCount);
+            int customerCount = dashboard.DashboardData.TotalCustomer;
+            await _hubContext.Clients.All.SendAsync("TotalCustomerAuto", customerCount);
+
             return Json(new { success = status });
         }
         catch (Exception ex)

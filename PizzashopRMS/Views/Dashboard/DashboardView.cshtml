@@ -98,31 +98,33 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 }
 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/6.0.0/signalr.min.js"></script>
 <script>
-        @* var revenueData = @Html.Raw(Json.Serialize(Model.DashboardData!.RevenueByDate));  // Assuming you use JSON to pass data
-    console.log("helloo",revenueData);
-    const labels = revenueData.map(x => x.date);
-    const values = revenueData.map(x => x.totalRevenue);
+    const connection = new signalR.HubConnectionBuilder()
+        .withUrl("/autoDashboard")
+        .configureLogging(signalR.LogLevel.Information) // Add this line
+        .build();
 
-    const ctx = document.getElementById('revenueChart').getContext('2d');
-    new Chart(ctx, {
-        type: 'line',
-        data: {
-            labels: labels,
-            datasets: [{
-                label: 'Revenue',
-                data: values,
-                borderColor: 'rgba(75, 192, 192, 1)',
-                fill: true,
-                backgroundColor: 'rgba(75, 192, 192, 0.2)'
-            }]
-        },
-        options: {
-            scales: {
-                x: { title: { display: true, text: 'Date' } },
-                y: { title: { display: true, text: 'Revenue' }, beginAtZero: true }
-            }
-        }
+    connection.on("WaitingListAuto", function (count) {
+        document.getElementById("waitingListCountAuto").innerText = count;
     });
-     *@
+    connection.on("TotalOrderAuto", function (count) {
+        document.getElementById("totalOrderCountAuto").innerText = count; 
+    });
+    connection.on("TotalSalesAuto", function (count) {
+        document.getElementById("totalSalesCountAuto").innerText = count; 
+    });
+    connection.on("AvgOrderAuto", function (count) {
+        document.getElementById("avgOrderCountAuto").innerText = count; 
+    });
+    connection.on("AvgWaitingTimeAuto", function (count) {
+        document.getElementById("avgWaitingTimeAuto").innerText = count; 
+    });
+    connection.on("TotalCustomerAuto", function (count) {
+        document.getElementById("totalCustomerCountAuto").innerText = count; 
+    });
+    
+    
+    
+    connection.start().catch(err => console.error(err.toString()));
 </script>

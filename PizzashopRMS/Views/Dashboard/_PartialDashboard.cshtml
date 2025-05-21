@@ -10,7 +10,7 @@
                 </div>
             </div>
             <div class="d-flex flex-column align-items-start">
-                <h4 class="m-0">@Model.DashboardData.TotalSales</h4>
+                <h4 class="m-0" id="totalSalesCountAuto">@Model.DashboardData.TotalSales</h4>
                 <p class="m-0">Total Sales</p>
             </div>
         </div>
@@ -27,7 +27,7 @@
                 </div>
             </div>
             <div class="d-flex flex-column align-items-start">
-                <h4 class="m-0">@Model.DashboardData.TotalOrder</h4>
+                <h4 class="m-0" id="totalOrderCountAuto">@Model.DashboardData.TotalOrder</h4>
                 <p class="m-0">Total Orders</p>
             </div>
         </div>
@@ -44,7 +44,7 @@
                 </div>
             </div>
             <div class="d-flex flex-column align-items-start bg-white">
-                <h4 class="m-0">@Model.DashboardData.AvgOrderValue</h4>
+                <h4 class="m-0"  id="avgOrderCountAuto">@Model.DashboardData.AvgOrderValue</h4>
                 <p class="m-0">Avg. Order Value</p>
             </div>
         </div>
@@ -69,8 +69,8 @@
                     ? $"{hours} hr {(minutes > 0 ? $"{minutes} min" : "")}"
                     : $"{minutes} min";
             }
-            <h4 class="m-0">@formattedTime</h4>
-                <p class="m-0">Avg. Waiting Time</p>
+            <h4 class="m-0" id="avgWaitingTimeAuto">@formattedTime</h4>
+                <p class="m-0" >Avg. Waiting Time</p>
             </div>
         </div>
     </div>
@@ -186,7 +186,7 @@
                         </div>
                     </div>
                     <div class="d-flex flex-column align-items-start justify-content-end bg-white">
-                        <h4 class="m-0">@Model.DashboardData.WaitingListCount</h4>
+                        <h4 class="m-0" id="waitingListCountAuto">@Model.DashboardData.WaitingListCount</h4>
                         <p class="m-0">Waiting List Count</p>
                     </div>
                 </div>
@@ -201,7 +201,7 @@
                         </div>
                     </div>
                     <div class="d-flex flex-column align-items-start bg-white">
-                        <h4 class="m-0">@Model.DashboardData.TotalCustomer</h4>
+                        <h4 class="m-0" id="totalCustomerCountAuto">@Model.DashboardData.TotalCustomer</h4>
                         <p class="m-0">New Customer Count</p>
                     </div>
                 </div>

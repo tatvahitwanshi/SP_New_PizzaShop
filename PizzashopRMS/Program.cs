@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using PizzaShopApp.Helpers;
+using PizzashopRMS.Helpers;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -33,6 +34,7 @@ builder.Services.AddScoped<IWaitingList, WaitingListRepository>();
 builder.Services.AddScoped<IMenuApp, MenuAppRepository>();
 builder.Services.AddScoped<IDashboard, DashboardRepository>();
 builder.Services.AddSingleton<GenerateJwtTokenHelper>();
+builder.Services.AddSignalR(); // add this to services
 
 
 // Configure JWT settings from appsettings.json
@@ -45,6 +47,7 @@ builder.Services.AddDistributedMemoryCache(); // Required for session state
 
 
 var app = builder.Build();
+app.MapHub<HubSignalR>("/autoDashboard"); 
 
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
