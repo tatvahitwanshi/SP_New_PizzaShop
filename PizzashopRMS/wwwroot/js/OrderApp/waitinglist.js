@@ -107,6 +107,10 @@ $(document).on("submit", "#AssignTokenForm", function (e) {
             if (response.success) {
                 toastr.success(response.message);
             }
+            else
+            {
+                toastr.error(response.message);
+            }
         },
         error: function () {
             toastr.error(response.message);

@@ -143,8 +143,11 @@ public class WaitingListController : BaseOrderAppController
         }
         catch (Exception ex)
         {
+            // _logger.LogError(ex, "Error assigning table to token ID {TokenId}", assignToken?.TokenId);
+            // return Json(new { success = false, message = "An error occurred while assigning the table." });
             _logger.LogError(ex, "Error assigning table to token ID {TokenId}", assignToken?.TokenId);
-            return Json(new { success = false, message = "An error occurred while assigning the table." });
+            var errorMessage = ex.InnerException?.Message ?? ex.Message;
+            return Json(new { success = false, message = errorMessage });
         }
     }
 

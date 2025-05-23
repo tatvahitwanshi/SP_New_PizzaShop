@@ -118,7 +118,21 @@
         document.getElementById("avgOrderCountAuto").innerText = count; 
     });
     connection.on("AvgWaitingTimeAuto", function (count) {
-        document.getElementById("avgWaitingTimeAuto").innerText = count; 
+        // Assuming 'count' is the number of minutes
+        var hours = Math.floor(count / 60);
+        var minutes = Math.round(count % 60);
+        var formattedTime = "";
+
+        if (hours > 0) {
+            formattedTime = hours + " hr";
+            if (minutes > 0) {
+                formattedTime += " " + minutes + " min";
+            }
+        } else {
+            formattedTime = minutes + " min";
+        }
+
+        document.getElementById("avgWaitingTimeAuto").innerText = formattedTime;
     });
     connection.on("TotalCustomerAuto", function (count) {
         document.getElementById("totalCustomerCountAuto").innerText = count; 

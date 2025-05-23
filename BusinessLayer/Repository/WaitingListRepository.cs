@@ -227,43 +227,52 @@ public class WaitingListRepository : IWaitingList
 
     public async Task assignToken(AssignToken assignToken)
     {
-        WaitingTable? token = await _db.WaitingTables.FirstOrDefaultAsync(x => x.Waitingid == assignToken.TokenId);
-        if (token != null)
-        {
-            token.Sectionid = (int)assignToken.SectionId!;
-            token.Isassigned = true;
-            token.Assigntime = DateTime.Now;
+        var connection = _db.Database.GetDbConnection();
+        var parameters = new DynamicParameters();
+        parameters.Add("TokenId", assignToken.TokenId);
+        parameters.Add("SectionId", assignToken.SectionId);
+        parameters.Add("TableId", assignToken.TableId);
+        parameters.Add("By", assignToken.By);
 
-            _db.MapTableTokens.Add(new MapTableToken
-            {
-                Tokenid = token.Waitingid,
-                Tableid = (int)assignToken.TableId
-            });
+        await connection.ExecuteAsync("CALL assign_token(@TokenId, @SectionId, @TableId, @By)", parameters);
 
-            if (assignToken.By != null)
-            {
-                token.EditedBy = assignToken.By;
-                token.EditDate = DateTime.Now;
-            }
+        // WaitingTable? token = await _db.WaitingTables.FirstOrDefaultAsync(x => x.Waitingid == assignToken.TokenId);
+        // if (token != null)
+        // {
+        //     token.Sectionid = (int)assignToken.SectionId!;
+        //     token.Isassigned = true;
+        //     token.Assigntime = DateTime.Now;
 
-            Table? table = await _db.Tables.FirstOrDefaultAsync(x => x.Tablesid == assignToken.TableId);
-            if (table != null)
-            {
-                table.Isoccupied = true;
-                table.Isrunning = false;
-                table.Currenttokenid = token.Waitingid;
+        //     _db.MapTableTokens.Add(new MapTableToken
+        //     {
+        //         Tokenid = token.Waitingid,
+        //         Tableid = (int)assignToken.TableId!
+        //     });
 
-                if (assignToken.By != null)
-                {
-                    table.EditedBy = assignToken.By;
-                    table.EditDate = DateTime.Now;
-                }
-                _db.Tables.Update(table);
-            }
+        //     if (assignToken.By != null)
+        //     {
+        //         token.EditedBy = assignToken.By;
+        //         token.EditDate = DateTime.Now;
+        //     }
 
-            _db.WaitingTables.Update(token);
-            await _db.SaveChangesAsync();
-        }
+        //     Table? table = await _db.Tables.FirstOrDefaultAsync(x => x.Tablesid == assignToken.TableId);
+        //     if (table != null)
+        //     {
+        //         table.Isoccupied = true;
+        //         table.Isrunning = false;
+        //         table.Currenttokenid = token.Waitingid;
+
+        //         if (assignToken.By != null)
+        //         {
+        //             table.EditedBy = assignToken.By;
+        //             table.EditDate = DateTime.Now;
+        //         }
+        //         _db.Tables.Update(table);
+        //     }
+
+        //     _db.WaitingTables.Update(token);
+        //     await _db.SaveChangesAsync();
+        // }
     }
 
     public async Task deleteToken(int id)

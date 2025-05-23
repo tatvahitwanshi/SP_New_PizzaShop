@@ -248,7 +248,7 @@ public class MenuAppController : BaseOrderAppController
             int updateAvgOrderCount = dashboard.DashboardData.AvgOrderValue;
             await _hubContext.Clients.All.SendAsync("AvgOrderAuto", updateAvgOrderCount);
             double? updateAvgWaitingTime = dashboard.DashboardData.AvgWaitingTime;
-            await _hubContext.Clients.All.SendAsync("AvgWaitingTimeAuto", updateAvgOrderCount);
+            await _hubContext.Clients.All.SendAsync("AvgWaitingTimeAuto", updateAvgWaitingTime);
             int customerCount = dashboard.DashboardData.TotalCustomer;
             await _hubContext.Clients.All.SendAsync("TotalCustomerAuto", customerCount);
 
