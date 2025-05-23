@@ -1,3 +1,4 @@
+using System.Data;
 using BusinessLayer.Interface;
 using Dapper;
 using DataAccessLayer.Models;
@@ -18,51 +19,72 @@ public class WaitingListRepository : IWaitingList
         _db = db;
     }
 
+    // public async Task<List<SectionDetails>> getSectionList()
+    // {
+    //     List<SectionDetails> list = await (from section in _db.Sections
+    //                                        where section.Isdeleted != true
+    //                                        orderby section.Sectionid
+    //                                        select new SectionDetails
+    //                                        {
+    //                                            SectionId = section.Sectionid,
+    //                                            SectionName = section.Sectionname,
+    //                                            TotalToken = (from token in _db.WaitingTables
+    //                                                          where token.Sectionid == section.Sectionid && token.Isassigned == false
+    //                                                          select token).Count()
+    //                                        }).ToListAsync();
+
+    //     int totalTokensAll = await _db.WaitingTables.Where(e => e.Isassigned == false).CountAsync();
+    //     list.Insert(0, new SectionDetails
+    //     {
+    //         SectionId = 0,
+    //         SectionName = "All",
+    //         TotalToken = totalTokensAll
+    //     });
+
+    //     return list;
+    // }
     public async Task<List<SectionDetails>> getSectionList()
     {
-        List<SectionDetails> list = await (from section in _db.Sections
-                                           where section.Isdeleted != true
-                                           orderby section.Sectionid
-                                           select new SectionDetails
-                                           {
-                                               SectionId = section.Sectionid,
-                                               SectionName = section.Sectionname,
-                                               TotalToken = (from token in _db.WaitingTables
-                                                             where token.Sectionid == section.Sectionid && token.Isassigned == false
-                                                             select token).Count()
-                                           }).ToListAsync();
+        var connection = _db.Database.GetDbConnection();
 
-        int totalTokensAll = await _db.WaitingTables.Where(e => e.Isassigned == false).CountAsync();
-        list.Insert(0, new SectionDetails
-        {
-            SectionId = 0,
-            SectionName = "All",
-            TotalToken = totalTokensAll
-        });
+        var sectionList = await connection.QueryAsync<SectionDetails>(
+            "SELECT * FROM get_section_list();"
+        );
 
-        return list;
+        return sectionList.ToList();
     }
 
+    // public async Task<List<TokenDetail>> getTokenList(int sectionId)
+    // {
+    //     List<TokenDetail> list = await (from token in _db.WaitingTables
+    //                                     join customer in _db.Customers on token.Customerid equals customer.Customerid
+    //                                     where (sectionId == 0 || token.Sectionid == sectionId) && token.Isassigned == false
+    //                                     orderby token.Tokennumber
+    //                                     select new TokenDetail
+    //                                     {
+    //                                         TokenId = token.Waitingid,
+    //                                         TokenNo = token.Tokennumber.ToString(),
+    //                                         CreatedDate = token.Tokendate,
+    //                                         NoOfPerson = token.Totalperson,
+    //                                         CustomerName = customer.Customername,
+    //                                         PhoneNo = customer.PhoneNumber,
+    //                                         Email = customer.Customeremail
+
+    //                                     }).ToListAsync();
+
+    //     return list;
+    // }
     public async Task<List<TokenDetail>> getTokenList(int sectionId)
     {
-        List<TokenDetail> list = await (from token in _db.WaitingTables
-                                        join customer in _db.Customers on token.Customerid equals customer.Customerid
-                                        where (sectionId == 0 || token.Sectionid == sectionId) && token.Isassigned == false
-                                        orderby token.Tokennumber
-                                        select new TokenDetail
-                                        {
-                                            TokenId = token.Waitingid,
-                                            TokenNo = token.Tokennumber.ToString(),
-                                            CreatedDate = token.Tokendate,
-                                            NoOfPerson = token.Totalperson,
-                                            CustomerName = customer.Customername,
-                                            PhoneNo = customer.PhoneNumber,
-                                            Email = customer.Customeremail
+        var connection = _db.Database.GetDbConnection();
 
-                                        }).ToListAsync();
+        var result = await connection.QueryAsync<TokenDetail>(
+            "SELECT * FROM get_token_list(@SectionId);",
+            new { SectionId = sectionId });
 
-        return list;
+        return result.ToList();
     }
+
     public async Task<List<TableSingle>> getTableList(int sectionId, int capacity)
     {
         List<TableSingle> tableList = await (from table in _db.Tables
@@ -275,33 +297,41 @@ public class WaitingListRepository : IWaitingList
         // }
     }
 
+    // public async Task deleteToken(int id)
+    // {
+    //     WaitingTable? token = await _db.WaitingTables.FirstOrDefaultAsync(x => x.Waitingid == id);
+    //     if (token != null)
+    //     {
+    //         List<int> map = await _db.MapTableTokens.Where(e => e.Tokenid == id).Select(m => m.Tableid).ToListAsync();
+
+    //         if (map?.Count > 0)
+    //         {
+    //             List<Table>? list = _db.Tables.Where(e => map.Contains(e.Tablesid)).ToList();
+    //             foreach (var table in list)
+    //             {
+    //                 table.Isoccupied = false;
+    //                 table.Isrunning = null;
+    //                 table.Currenttokenid = null;
+    //             }
+
+    //             _db.Tables.UpdateRange(list);
+    //         }
+
+
+    //         IQueryable<MapTableToken> removeMap = _db.MapTableTokens.Where(e => e.Tokenid == id);
+    //         _db.MapTableTokens.RemoveRange(removeMap);
+    //         _db.WaitingTables.Remove(token);
+    //         await _db.SaveChangesAsync();
+    //     }
+    //     return;
+    // }
     public async Task deleteToken(int id)
     {
-        WaitingTable? token = await _db.WaitingTables.FirstOrDefaultAsync(x => x.Waitingid == id);
-        if (token != null)
-        {
-            List<int> map = await _db.MapTableTokens.Where(e => e.Tokenid == id).Select(m => m.Tableid).ToListAsync();
+        var parameters = new DynamicParameters();
+        parameters.Add("token_id", id);
+        var connection = _db.Database.GetDbConnection();
+        await connection.ExecuteAsync("CALL delete_token(@token_id);", parameters);
 
-            if (map?.Count > 0)
-            {
-                List<Table>? list = _db.Tables.Where(e => map.Contains(e.Tablesid)).ToList();
-                foreach (var table in list)
-                {
-                    table.Isoccupied = false;
-                    table.Isrunning = null;
-                    table.Currenttokenid = null;
-                }
-
-                _db.Tables.UpdateRange(list);
-            }
-
-
-            IQueryable<MapTableToken> removeMap = _db.MapTableTokens.Where(e => e.Tokenid == id);
-            _db.MapTableTokens.RemoveRange(removeMap);
-            _db.WaitingTables.Remove(token);
-            await _db.SaveChangesAsync();
-        }
-        return;
     }
 
     public async Task<Customer?> getCustomerFromEmail(string email)
