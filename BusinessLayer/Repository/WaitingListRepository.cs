@@ -85,56 +85,89 @@ public class WaitingListRepository : IWaitingList
         return result.ToList();
     }
 
+    // public async Task<List<TableSingle>> getTableList(int sectionId, int capacity)
+    // {
+    //     List<TableSingle> tableList = await (from table in _db.Tables
+    //                                          where table.Sectionid == sectionId
+    //                                              && table.Isdeleted == false
+    //                                              && table.Isoccupied == false
+    //                                              && Convert.ToInt32(table.Tablecapacity) >= capacity
+    //                                          orderby table.Tablename
+    //                                          select new TableSingle
+    //                                          {
+    //                                              TableId = table.Tablesid,
+    //                                              TableName = table.Tablename
+    //                                          }).ToListAsync();
+
+    //     return tableList;
+    // }
     public async Task<List<TableSingle>> getTableList(int sectionId, int capacity)
     {
-        List<TableSingle> tableList = await (from table in _db.Tables
-                                             where table.Sectionid == sectionId
-                                                 && table.Isdeleted == false
-                                                 && table.Isoccupied == false
-                                                 && Convert.ToInt32(table.Tablecapacity) >= capacity
-                                             orderby table.Tablename
-                                             select new TableSingle
-                                             {
-                                                 TableId = table.Tablesid,
-                                                 TableName = table.Tablename
-                                             }).ToListAsync();
+        var connection = _db.Database.GetDbConnection();
 
-        return tableList;
+        var result = await connection.QueryAsync<TableSingle>(
+            "SELECT * FROM get_table_list(@SectionId, @Capacity);",
+            new { SectionId = sectionId, Capacity = capacity });
+
+        return result.ToList();
     }
+
+    // public async Task<WaitingToken> getToken(int id)
+    // {
+    //     WaitingToken token = new WaitingToken();
+    //     token.SectionList = await (from section in _db.Sections
+    //                                where section.Isdeleted == false
+    //                                orderby section.Sectionid
+    //                                select new SectionDetails
+    //                                {
+    //                                    SectionId = section.Sectionid,
+    //                                    SectionName = section.Sectionname
+    //                                }).ToListAsync();
+
+    //     if (id != 0)
+    //     {
+    //         WaitingTable? tokenDetails = await _db.WaitingTables.FirstOrDefaultAsync(x => x.Waitingid == id);
+    //         if (tokenDetails != null)
+    //         {
+    //             token.TokenId = tokenDetails.Waitingid;
+    //             token.NumberOfPersons = tokenDetails.Totalperson;
+    //             token.SectionId = tokenDetails.Sectionid;
+
+    //             Customer? customer = await _db.Customers.FirstOrDefaultAsync(x => x.Customerid == tokenDetails.Customerid);
+    //             if (customer != null)
+    //             {
+    //                 token.CustomerEmail = customer.Customeremail;
+    //                 token.CustomerName = customer.Customername;
+    //                 token.MobileNo = customer.PhoneNumber;
+    //             }
+    //         }
+    //     }
+
+    //     return token;
+    // }
 
     public async Task<WaitingToken> getToken(int id)
     {
-        WaitingToken token = new WaitingToken();
-        token.SectionList = await (from section in _db.Sections
-                                   where section.Isdeleted == false
-                                   orderby section.Sectionid
-                                   select new SectionDetails
-                                   {
-                                       SectionId = section.Sectionid,
-                                       SectionName = section.Sectionname
-                                   }).ToListAsync();
+        var connection = _db.Database.GetDbConnection();
+
+        var sectionList = (await connection.QueryAsync<SectionDetails>(
+            "SELECT * FROM get_active_sections();")).ToList();
 
         if (id != 0)
         {
-            WaitingTable? tokenDetails = await _db.WaitingTables.FirstOrDefaultAsync(x => x.Waitingid == id);
-            if (tokenDetails != null)
-            {
-                token.TokenId = tokenDetails.Waitingid;
-                token.NumberOfPersons = tokenDetails.Totalperson;
-                token.SectionId = tokenDetails.Sectionid;
+            var token = await connection.QueryFirstOrDefaultAsync<WaitingToken>(
+                "SELECT * FROM get_token_by_id(@Id);", new { Id = id });
 
-                Customer? customer = await _db.Customers.FirstOrDefaultAsync(x => x.Customerid == tokenDetails.Customerid);
-                if (customer != null)
-                {
-                    token.CustomerEmail = customer.Customeremail;
-                    token.CustomerName = customer.Customername;
-                    token.MobileNo = customer.PhoneNumber;
-                }
+            if (token != null)
+            {
+                token.SectionList = sectionList;
+                return token;
             }
         }
 
-        return token;
+        return new WaitingToken { SectionList = sectionList };
     }
+
 
     // public async Task generateToken(WaitingToken token)
     // {

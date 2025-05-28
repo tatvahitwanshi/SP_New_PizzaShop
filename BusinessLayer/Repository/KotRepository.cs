@@ -264,22 +264,36 @@ public class KotRepository : IKot
     {
         try
         {
-            using (var conn = _db.Database.GetDbConnection())
-            {
-                await conn.OpenAsync();
+            // using (var conn = _db.Database.GetDbConnection())
+            // {
+            //     await conn.OpenAsync();
 
-                var parameters = new DynamicParameters();
-                parameters.Add("p_order_id", orderId);
-                parameters.Add("success", dbType: DbType.Boolean, direction: ParameterDirection.Output);
-                parameters.Add("message", dbType: DbType.String, direction: ParameterDirection.Output, size: 500);
+            //     var parameters = new DynamicParameters();
+            //     parameters.Add("p_order_id", orderId);
+            //     parameters.Add("success", dbType: DbType.Boolean, direction: ParameterDirection.Output);
+            //     parameters.Add("message", dbType: DbType.String, direction: ParameterDirection.Output, size: 500);
 
-                await conn.ExecuteAsync("mark_order_served", parameters, commandType: CommandType.StoredProcedure);
+            //     await conn.ExecuteAsync("mark_order_served", parameters, commandType: CommandType.StoredProcedure);
 
-                bool isSuccess = parameters.Get<bool>("success");
-                string resultMessage = parameters.Get<string>("message");
+            //     bool isSuccess = parameters.Get<bool>("success");
+            //     string resultMessage = parameters.Get<string>("message");
 
-                return (isSuccess, resultMessage);
-            }
+            //     return (isSuccess, resultMessage);
+            // }
+            return await ExecuteWithMultipleOutputsAsync(
+                "mark_order_served",
+                p =>
+                {
+                    p.Add("p_order_id", orderId, DbType.Int32);
+                    p.Add("success", dbType: DbType.Boolean, direction: ParameterDirection.Output);
+                    p.Add("message", dbType: DbType.String, direction: ParameterDirection.Output, size: 500);
+                },
+                p =>
+                (
+                    p.Get<bool>("success"),
+                    p.Get<string>("message")
+                )
+            );
         }
         catch
         {
@@ -287,6 +301,20 @@ public class KotRepository : IKot
         }
 
     }
+
+    public async Task<TOut> ExecuteWithMultipleOutputsAsync<TOut>(string procName, Action<DynamicParameters> buildParams, Func<DynamicParameters, TOut> mapOutputs)
+    {
+        using var conn = _db.Database.GetDbConnection();
+        await conn.OpenAsync();
+ 
+        var parameters = new DynamicParameters();
+        buildParams(parameters);
+ 
+        await conn.ExecuteAsync(procName, parameters, commandType: CommandType.StoredProcedure);
+ 
+        return mapOutputs(parameters);
+    }
+ 
 
 
 }

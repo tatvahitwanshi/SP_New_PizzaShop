@@ -1,8 +1,11 @@
+using System.Data;
 using System.Transactions;
 using BusinessLayer.Interface;
+using Dapper;
 using DataAccessLayer.Models;
 using DataAccessLayer.ViewModels;
 using Microsoft.EntityFrameworkCore;
+using Newtonsoft.Json;
 namespace BusinessLayer.Repository;
 
 public class TablesAppRepository : ITablesApp
@@ -14,81 +17,109 @@ public class TablesAppRepository : ITablesApp
         _db = db;
     }
 
-    public  async Task<List<SectionOrderView>> getTableOrders()
+    // public  async Task<List<SectionOrderView>> getTableOrders()
+    // {
+    //     List<SectionOrderView> sectionOrders = new List<SectionOrderView>();
+
+    //     sectionOrders = await (from section in _db.Sections
+    //                     where section.Isdeleted == false
+    //                     orderby section.Sectionid
+    //                     select new SectionOrderView
+    //                     {
+    //                         SectionId = section.Sectionid,
+    //                         SectionName = section.Sectionname,
+    //                         TableList = (from table in _db.Tables
+    //                                      where table.Sectionid == section.Sectionid && table.Isdeleted == false
+    //                                      orderby table.Tablesid
+    //                                      select new TableOrderView
+    //                                      {
+    //                                          TableId = table.Tablesid,
+    //                                          TableName = table.Tablename,
+    //                                          Capacity = Convert.ToInt32(table.Tablecapacity),
+    //                                          isOccupied = table.Isoccupied,
+    //                                          isRunning = (bool)table.Isoccupied! ? table.Isrunning : null,
+    //                                          OrderTokenId = (bool)table.Isoccupied ? table.Currenttokenid : null                                             
+    //                                      }).ToList()
+
+    //                     }).ToListAsync();
+
+    //     foreach (var section in sectionOrders)
+    //     {
+    //         section.AvailableCount = 0;
+    //         section.AssignedCount = 0;
+    //         section.RunningCount = 0;
+
+    //         if (section.TableList != null)
+    //         {
+    //             foreach(var table in section.TableList)
+    //             {
+    //                 if(table.isOccupied != null && table.isRunning != null && table.OrderTokenId != null)
+    //                 {
+    //                     table.OrderAmount = await _db.Orders
+    //                                                 .Where(x => x.Orderid == table.OrderTokenId)
+    //                                                 .Select(x => x.Totalamount)
+    //                                                 .FirstOrDefaultAsync();
+    //                 }
+
+    //                 if(table.isOccupied != null && table.isOccupied == true)
+    //                 {
+    //                     if(table.isRunning != null && table.isRunning == true)
+    //                     {
+    //                         table.Time = await _db.Orders
+    //                                             .Where(x => x.Orderid == table.OrderTokenId)
+    //                                             .Select(x => x.CreatedDate)
+    //                                             .FirstOrDefaultAsync();
+    //                         table.Status = "running";
+    //                         section.RunningCount += 1;
+    //                     }
+    //                     else if(table.isRunning != null && table.isRunning == false)
+    //                     {
+    //                         table.Time = await _db.WaitingTables
+    //                                             .Where(x => x.Waitingid == table.OrderTokenId)
+    //                                             .Select(x => x.Assigntime)
+    //                                             .FirstOrDefaultAsync();
+    //                         table.Status = "assigned";
+    //                         section.AssignedCount += 1;
+    //                     }
+    //                 }else
+    //                 {
+    //                     Console.WriteLine(table.Time);
+    //                     table.Status = "available";
+    //                     section.AvailableCount += 1;
+    //                 }
+    //             }
+    //         }
+    //     }
+    //     return sectionOrders;
+    // }
+    public async Task<List<SectionOrderView>> getTableOrders()
     {
-        List<SectionOrderView> sectionOrders = new List<SectionOrderView>();
+        var connection = _db.Database.GetDbConnection();
 
-        sectionOrders = await (from section in _db.Sections
-                        where section.Isdeleted == false
-                        orderby section.Sectionid
-                        select new SectionOrderView
-                        {
-                            SectionId = section.Sectionid,
-                            SectionName = section.Sectionname,
-                            TableList = (from table in _db.Tables
-                                         where table.Sectionid == section.Sectionid && table.Isdeleted == false
-                                         orderby table.Tablesid
-                                         select new TableOrderView
-                                         {
-                                             TableId = table.Tablesid,
-                                             TableName = table.Tablename,
-                                             Capacity = Convert.ToInt32(table.Tablecapacity),
-                                             isOccupied = table.Isoccupied,
-                                             isRunning = (bool)table.Isoccupied ? table.Isrunning : null,
-                                             OrderTokenId = (bool)table.Isoccupied ? table.Currenttokenid : null                                             
-                                         }).ToList()
-
-                        }).ToListAsync();
-
-        foreach (var section in sectionOrders)
+        try
         {
-            section.AvailableCount = 0;
-            section.AssignedCount = 0;
-            section.RunningCount = 0;
+            await connection.OpenAsync();
 
-            if (section.TableList != null)
+            using var command = connection.CreateCommand();
+            command.CommandText = "SELECT get_section_tables_orderapp()";
+            command.CommandType = CommandType.Text;
+
+            var result = await command.ExecuteScalarAsync();
+
+            if (result != null && result != DBNull.Value)
             {
-                foreach(var table in section.TableList)
-                {
-                    if(table.isOccupied != null && table.isRunning != null && table.OrderTokenId != null)
-                    {
-                        table.OrderAmount = await _db.Orders
-                                                    .Where(x => x.Orderid == table.OrderTokenId)
-                                                    .Select(x => x.Totalamount)
-                                                    .FirstOrDefaultAsync();
-                    }
-
-                    if(table.isOccupied != null && table.isOccupied == true)
-                    {
-                        if(table.isRunning != null && table.isRunning == true)
-                        {
-                            table.Time = await _db.Orders
-                                                .Where(x => x.Orderid == table.OrderTokenId)
-                                                .Select(x => x.CreatedDate)
-                                                .FirstOrDefaultAsync();
-                            table.Status = "running";
-                            section.RunningCount += 1;
-                        }
-                        else if(table.isRunning != null && table.isRunning == false)
-                        {
-                            table.Time = await _db.WaitingTables
-                                                .Where(x => x.Waitingid == table.OrderTokenId)
-                                                .Select(x => x.Assigntime)
-                                                .FirstOrDefaultAsync();
-                            table.Status = "assigned";
-                            section.AssignedCount += 1;
-                        }
-                    }else
-                    {
-                        Console.WriteLine(table.Time);
-                        table.Status = "available";
-                        section.AvailableCount += 1;
-                    }
-                }
+                var jsonResult = result.ToString();
+                return JsonConvert.DeserializeObject<List<SectionOrderView>>(jsonResult!)!;
             }
         }
-        return sectionOrders;
+        finally
+        {
+            await connection.CloseAsync();
+        }
+
+        return new List<SectionOrderView>();
     }
+
     private static IEnumerable<List<T>> GetCombinations<T>(List<T> list, int length)
     {
         if (length == 1)
@@ -109,7 +140,7 @@ public class TablesAppRepository : ITablesApp
             bool status = true;
             string message= "Tables Assigned Successfully";
             // Check if customer already has an assigned table
-            var customer = await _db.Customers.FirstOrDefaultAsync(c => c.Customeremail.ToLower().Trim() == model.CustomerEmail.ToLower().Trim());
+            var customer = await _db.Customers.FirstOrDefaultAsync(c => c.Customeremail!.ToLower().Trim() == model.CustomerEmail!.ToLower().Trim());
             if (customer != null)
             {
                 bool alreadyAssigned = await _db.WaitingTables
@@ -120,8 +151,8 @@ public class TablesAppRepository : ITablesApp
                     return (false, "Customer already has an assigned table.");
                 }
             }
-            
-            
+
+
             if (tableIdsForAssign != null && tableIdsForAssign.Count > 0)
             {
                 var availableTables = _db.Tables
@@ -162,38 +193,49 @@ public class TablesAppRepository : ITablesApp
             if(model.TokenId != null) token= await _db.WaitingTables.FirstOrDefaultAsync(x => x.Waitingid == model.TokenId);
             else token = await generateToken(model);
 
-            if(token != null)
+            if (token != null)
             {
-                token.Isassigned= true;
-                token.Assigntime= DateTime.Now;
-                token.EditDate= DateTime.Now;
-                token.EditedBy= model.By;
+                // token.Isassigned= true;
+                // token.Assigntime= DateTime.Now;
+                // token.EditDate= DateTime.Now;
+                // token.EditedBy= model.By;
 
-                foreach(var tableId in tableIdsForAssign)
-                {
-                    _db.MapTableTokens.Add(new MapTableToken
+                // foreach(var tableId in tableIdsForAssign)
+                // {
+                //     _db.MapTableTokens.Add(new MapTableToken
+                //     {
+                //         Tableid = tableId,
+                //         Tokenid = token.Waitingid,
+
+                //     });
+                //     Table? singleTable = _db.Tables.FirstOrDefault(x => x.Tablesid == tableId);
+                //     if(singleTable != null)
+                //     {
+                //         singleTable.Isoccupied = true;
+                //         singleTable.Isrunning = false;
+                //         singleTable.Currenttokenid = token.Waitingid;
+                //         singleTable.EditDate= DateTime.Now;
+                //         singleTable.EditedBy= model.By;
+                //         _db.Update(singleTable);
+                //     }
+                // }
+                
+                var tableIdArray = tableIdsForAssign.ToArray();
+
+                await _db.Database.GetDbConnection().ExecuteAsync(
+                    "CALL assign_multiple_tables_in_tableapp(@tokenId, @by, @tableIds)",
+                    new
                     {
-                        Tableid = tableId,
-                        Tokenid = token.Waitingid,
-                    
+                        tokenId = token.Waitingid,
+                        by = model.By!,
+                        tableIds = tableIdArray
                     });
-                    Table? singleTable = _db.Tables.FirstOrDefault(x => x.Tablesid == tableId);
-                    if(singleTable != null)
-                    {
-                        singleTable.Isoccupied = true;
-                        singleTable.Isrunning = false;
-                        singleTable.Currenttokenid = token.Waitingid;
-                        singleTable.EditDate= DateTime.Now;
-                        singleTable.EditedBy= model.By;
-                        _db.Update(singleTable);
-                    }
-                }
             }
-            await _db.SaveChangesAsync();
+            // await _db.SaveChangesAsync();
             await transaction.CommitAsync();
             return (status, message);
         }
-        catch(Exception ex)
+        catch (Exception ex)
         {
             await transaction.RollbackAsync();
             return (false, ex.Message);
@@ -202,51 +244,69 @@ public class TablesAppRepository : ITablesApp
 
     public async Task<WaitingTable?> generateToken(WaitingToken token)
     {
-        //pwd
-        Customer? customer = _db.Customers.FirstOrDefault(x => x.Customeremail == token.CustomerEmail);
+        var parameters = new DynamicParameters();
+        parameters.Add("in_customer_name", token.CustomerName);
+        parameters.Add("in_mobile_no", token.MobileNo);
+        parameters.Add("in_customer_email", token.CustomerEmail);
+        parameters.Add("in_number_of_persons", token.NumberOfPersons);
+        parameters.Add("in_section_id", token.SectionId);
+        parameters.Add("in_by", token.By);
+        parameters.Add("in_token_id", token.TokenId ?? 0);
+        parameters.Add("out_waiting_id", dbType: DbType.Int32, direction: ParameterDirection.Output);
+
+        // using var connection = _db.Database.GetDbConnection();
     
+        await  _db.Database.GetDbConnection().ExecuteAsync("generate_waiting_token_tableapp", parameters, commandType: CommandType.StoredProcedure); 
 
-        if(customer == null)
-        {
-            customer = new Customer
-            {
-                Customername = token.CustomerName!,
-                PhoneNumber = token.MobileNo,
-                Customeremail = token.CustomerEmail,
-                CreatedDate = DateTime.Now
-            };
-            _db.Customers.Add(customer);
-            await _db.SaveChangesAsync();
-        }else
-        {
-            customer.Customername = token.CustomerName!;
-            customer.PhoneNumber = token.MobileNo;
+        int newWaitingId = parameters.Get<int>("out_waiting_id");
 
-            _db.Customers.Update(customer);
-            await _db.SaveChangesAsync();
-        }
-        customer = await _db.Customers.FirstOrDefaultAsync(x => x.Customeremail == token.CustomerEmail);
-
-        var existingWaiting = await _db.WaitingTables.AnyAsync(x => x.Customerid == customer!.Customerid && (token.TokenId == null || token.TokenId == 0 || x.Waitingid != token.TokenId));
-
-            if (existingWaiting)
-                throw new InvalidOperationException("Customer is already in the waiting list.");
-
-        // Generate a new token
-        WaitingTable? newToken = new WaitingTable
-        {
-            Tokennumber = _db.WaitingTables.Any()? _db.WaitingTables.Max(e => e.Tokennumber) + 1 : 1,
-            Totalperson = (short)token.NumberOfPersons!,
-            Tokendate = DateTime.Now,
-            Sectionid = (int)token.SectionId!,
-            Customerid = customer.Customerid,
-            CreatedBy = token.By,
-        };
-        _db.WaitingTables.Add(newToken);
-        await _db.SaveChangesAsync();
+        return await _db.WaitingTables.FirstOrDefaultAsync(x => x.Waitingid == newWaitingId);
+        //pwd
+        // Customer? customer = _db.Customers.FirstOrDefault(x => x.Customeremail == token.CustomerEmail);
 
 
-        return newToken;
+        // if (customer == null)
+        // {
+        //     customer = new Customer
+        //     {
+        //         Customername = token.CustomerName!,
+        //         PhoneNumber = token.MobileNo,
+        //         Customeremail = token.CustomerEmail,
+        //         CreatedDate = DateTime.Now
+        //     };
+        //     _db.Customers.Add(customer);
+        //     await _db.SaveChangesAsync();
+        // }
+        // else
+        // {
+        //     customer.Customername = token.CustomerName!;
+        //     customer.PhoneNumber = token.MobileNo;
+
+        //     _db.Customers.Update(customer);
+        //     await _db.SaveChangesAsync();
+        // }
+        // customer = await _db.Customers.FirstOrDefaultAsync(x => x.Customeremail == token.CustomerEmail);
+
+        // var existingWaiting = await _db.WaitingTables.AnyAsync(x => x.Customerid == customer!.Customerid && (token.TokenId == null || token.TokenId == 0 || x.Waitingid != token.TokenId));
+
+        // if (existingWaiting)
+        //     throw new InvalidOperationException("Customer is already in the waiting list.");
+
+        // // Generate a new token
+        // WaitingTable? newToken = new WaitingTable
+        // {
+        //     Tokennumber = _db.WaitingTables.Any() ? _db.WaitingTables.Max(e => e.Tokennumber) + 1 : 1,
+        //     Totalperson = (short)token.NumberOfPersons!,
+        //     Tokendate = DateTime.Now,
+        //     Sectionid = (int)token.SectionId!,
+        //     Customerid = customer!.Customerid,
+        //     CreatedBy = token.By,
+        // };
+        // _db.WaitingTables.Add(newToken);
+        // await _db.SaveChangesAsync();
+
+
+        // return newToken;
     }
 
     public int getTokenId(int tableId)
@@ -254,4 +314,6 @@ public class TablesAppRepository : ITablesApp
         Table? table = _db.Tables.FirstOrDefault(e => e.Tablesid == tableId && e.Isoccupied == true && e.Isrunning == false);
         return (int)(table != null ? table.Currenttokenid! : 0);
     }
+    
+ 
 }
